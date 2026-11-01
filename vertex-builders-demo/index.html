@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<!-- PROTOTYPE for Vertex Builders & Development Corp - throwaway demo, not production code. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vertex Builders &amp; Development Corp</title>
+<style>
+  :root{
+    /* BMW design system: exact tokens from popular-web-designs/templates/bmw.md */
+    --blue:#1c69d4; --blue-focus:#0653b6;
+    --ink:#262626; --meta:#757575; --silver:#bbbbbb;
+    --white:#fff; --dark:#101010; --dark-2:#1a1a1a; --line:#e4e4e4;
+    --font:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --nav-h:72px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:var(--font);color:var(--ink);background:var(--white);
+       font-size:16px;line-height:1.15;-webkit-font-smoothing:antialiased}
+  img{display:block;max-width:100%}
+  a{color:inherit;text-decoration:none}
+  button,input,textarea,select{font:inherit;color:inherit}
+  :focus-visible{outline:2px solid var(--blue-focus);outline-offset:3px}
+  .wrap{max-width:1240px;margin:0 auto;padding:0 24px}
+
+  /* ---- header: BMW nav weight 900, white on dark ---- */
+  header{position:sticky;top:0;z-index:40;background:var(--dark);
+         border-bottom:1px solid rgba(255,255,255,.12)}
+  .bar{height:var(--nav-h);display:flex;align-items:center;gap:32px}
+  .logo{display:flex;align-items:center;gap:12px;color:var(--white);
+        font-weight:900;font-size:18px;letter-spacing:.02em;text-transform:uppercase}
+  .logo svg{flex:none}
+  nav{margin-left:auto;display:flex;gap:30px}
+  nav a{color:var(--silver);font-weight:900;font-size:15px;text-transform:uppercase;
+        letter-spacing:.04em;line-height:1.3;padding:8px 0;min-height:44px;
+        display:flex;align-items:center;transition:color .18s}
+  nav a:hover{color:var(--white)}
+  nav a.active{color:var(--white);box-shadow:inset 0 -2px 0 var(--blue)}
+  #burger{display:none;margin-left:auto;background:none;border:1px solid rgba(255,255,255,.3);
+          color:var(--white);width:44px;height:44px;cursor:pointer}
+
+  /* ---- buttons: zero radius, sharp ---- */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;
+       min-height:48px;padding:0 28px;background:var(--blue);color:var(--white);
+       font-weight:700;font-size:16px;border:none;cursor:pointer;transition:background .18s}
+  .btn:hover{background:var(--blue-focus)}
+  .btn-ghost{background:transparent;color:var(--white);border-bottom:1px solid var(--white);
+             padding:0 4px;min-height:40px;font-weight:700}
+  .btn-ghost:hover{background:rgba(255,255,255,.1)}
+
+  /* ---- hero: dark, full-bleed photo, 60px uppercase weight 300 ---- */
+  .hero{position:relative;min-height:min(520px,calc(100vh - var(--nav-h)));display:flex;align-items:flex-end;
+        background:var(--dark);overflow:hidden}
+  .hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:1}
+  /* gradient scrim instead of flat dimming: keeps the photo visible on the right,
+     keeps the left legible for text */
+  .hero::after{content:"";position:absolute;inset:0;
+    background:linear-gradient(100deg,rgba(10,10,10,.92) 0%,rgba(10,10,10,.78) 42%,rgba(10,10,10,.30) 100%)}
+  .hero .wrap{position:relative;z-index:1;padding-bottom:44px;padding-top:52px;width:100%}
+  .eyebrow{color:#5a9bf0;font-weight:900;font-size:13px;letter-spacing:.18em;
+           text-transform:uppercase;margin-bottom:20px}
+  h1{color:var(--white);font-size:clamp(34px,7vw,60px);font-weight:300;line-height:1.1;
+     text-transform:uppercase;letter-spacing:-.01em;max-width:16ch}
+  .hero p{color:#d4d8dc;max-width:52ch;margin:20px 0 32px;line-height:1.6;font-size:17px}
+  .hero-actions{display:flex;gap:20px;flex-wrap:wrap;align-items:center}
+
+  /* ---- stats strip ---- */
+  .stats{background:var(--dark-2);color:var(--white);padding:56px 0}
+  .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:32px}
+  .stat b{display:block;font-size:44px;font-weight:300;line-height:1.1;color:var(--white)}
+  .stat span{display:block;margin-top:10px;color:var(--meta);font-size:13px;
+             text-transform:uppercase;letter-spacing:.12em;font-weight:700}
+
+  /* ---- sections ---- */
+  section.page{display:block}
+  .block{padding:96px 0}
+  .block.alt{background:#f6f6f6}
+  h2{font-size:clamp(26px,4vw,32px);font-weight:400;line-height:1.3;text-transform:uppercase;
+     letter-spacing:.01em}
+  .lead{color:var(--meta);max-width:58ch;margin-top:16px;line-height:1.6}
+  .head{margin-bottom:48px}
+
+  /* ---- cards ---- */
+  .grid{display:grid;gap:24px}
+  .g3{grid-template-columns:repeat(3,1fr)}
+  .g2{grid-template-columns:repeat(2,1fr)}
+  .card{background:var(--white);border:1px solid var(--line);display:flex;flex-direction:column}
+  .card .ph{aspect-ratio:4/3;overflow:hidden;background:#ddd}
+  .card .ph img{width:100%;height:100%;object-fit:cover;transition:transform .4s}
+  .card:hover .ph img{transform:scale(1.04)}
+  .card .body{padding:24px;flex:1;display:flex;flex-direction:column}
+  .card h3{font-size:19px;font-weight:700;line-height:1.3}
+  .card .tag{color:var(--blue);font-weight:900;font-size:11px;letter-spacing:.14em;
+             text-transform:uppercase;margin-bottom:12px}
+  .card p{color:var(--meta);line-height:1.6;margin-top:10px;font-size:15px}
+  .card .meta{margin-top:auto;padding-top:18px;color:var(--meta);font-size:13px;
+              border-top:1px solid var(--line);display:flex;justify-content:space-between;
+              align-items:center;gap:8px}
+  .card .go{color:var(--blue);font-weight:900;font-size:11px;letter-spacing:.1em;
+            text-transform:uppercase;margin-left:auto;transition:transform .2s}
+  .card:hover .go{transform:translateX(3px)}
+  .card{cursor:pointer}
+  .svc{padding:32px;border:1px solid var(--line);background:var(--white);transition:border-color .2s}
+  .svc:hover{border-color:var(--blue)}
+  .svc .n{color:var(--blue);font-weight:300;font-size:40px;line-height:1}
+  .svc h3{margin:18px 0 10px;font-size:19px;font-weight:700}
+  .svc p{color:var(--meta);line-height:1.6;font-size:15px}
+
+  /* ---- filters ---- */
+  .filters{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px}
+  .filters button{min-height:44px;padding:0 20px;background:var(--white);
+                  border:1px solid var(--line);cursor:pointer;font-weight:700;font-size:14px;
+                  text-transform:uppercase;letter-spacing:.06em;transition:all .18s}
+  .filters button:hover{border-color:var(--ink)}
+  .filters button.active{background:var(--ink);color:var(--white);border-color:var(--ink)}
+  .searchrow{display:flex;gap:16px;flex-wrap:wrap;align-items:center;margin-bottom:28px;
+             max-width:640px}
+  .searchrow input{flex:1;min-width:240px;min-height:48px;padding:0 16px;
+                   border:1px solid var(--line);background:var(--white)}
+  .searchrow input:focus{border-color:var(--blue);outline:none}
+  #result-count{color:var(--meta);font-size:14px;font-weight:700;text-transform:uppercase;
+                letter-spacing:.08em}
+
+  /* ---- split ---- */
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
+  .split img{width:100%;height:100%;object-fit:cover;aspect-ratio:3/2}
+  .split ul{list-style:none;margin-top:24px}
+  .split li{padding:14px 0 14px 30px;border-bottom:1px solid var(--line);position:relative;
+            color:var(--meta);line-height:1.5}
+  .split li::before{content:"";position:absolute;left:0;top:21px;width:14px;height:2px;
+                    background:var(--blue)}
+
+  /* ---- contact / form ---- */
+  form{display:grid;gap:18px}
+  label{display:block;font-size:12px;font-weight:900;letter-spacing:.12em;
+        text-transform:uppercase;margin-bottom:8px;color:var(--meta)}
+  input,select,textarea{width:100%;min-height:48px;padding:12px 16px;border:1px solid var(--line);
+                        background:var(--white)}
+  textarea{min-height:130px;resize:vertical;line-height:1.5}
+  input:focus,select:focus,textarea:focus{border-color:var(--blue);outline:none}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .form-success{background:#eaf2fd;border-left:3px solid var(--blue);padding:16px 20px;
+                color:var(--blue-focus);line-height:1.5;font-weight:700}
+  .info{display:grid;gap:20px}
+  .info div{border-left:2px solid var(--blue);padding-left:18px}
+  .info dt{font-size:12px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;
+           color:var(--meta);margin-bottom:6px}
+  .info dd{line-height:1.5}
+
+  /* ---- footer ---- */
+  footer{background:var(--dark);color:var(--silver);padding:64px 0 28px}
+  .fgrid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:48px}
+  footer h4{color:var(--white);font-size:12px;font-weight:900;letter-spacing:.14em;
+            text-transform:uppercase;margin-bottom:18px}
+  footer p,footer li{line-height:1.7;font-size:14px}
+  footer ul{list-style:none}
+  footer ul a{display:inline-flex;align-items:center;min-height:36px}
+  footer a:hover{color:var(--white)}
+  .fbot{margin-top:48px;padding-top:24px;border-top:1px solid rgba(255,255,255,.12);
+        display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
+        font-size:13px;color:var(--meta)}
+
+  /* ---- lightbox ---- */
+  #lightbox{position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.92);display:flex;
+            align-items:center;justify-content:center;padding:32px;cursor:zoom-out}
+  #lightbox img{max-width:100%;max-height:100%;object-fit:contain}
+
+  .proto{background:var(--blue);color:var(--white);text-align:center;padding:10px 16px;
+         font-size:13px;font-weight:700;letter-spacing:.04em}
+
+  /* a display: rule overrides the hidden attribute - this must come after both */
+  [hidden]{display:none !important}
+
+  @media (max-width:900px){
+    .g3,.g2,.fgrid,.stats-grid{grid-template-columns:1fr 1fr}
+    .split{grid-template-columns:1fr;gap:32px}
+  }
+  @media (max-width:768px){
+    nav{display:none;margin:0}
+    #burger{display:flex;align-items:center;justify-content:center}
+    body.nav-open nav{display:flex;position:absolute;top:var(--nav-h);left:0;right:0;
+      flex-direction:column;gap:0;background:var(--dark);padding:8px 24px 20px;
+      border-bottom:1px solid rgba(255,255,255,.12)}
+    body.nav-open nav a{min-height:52px;width:100%}
+    .block{padding:64px 0}
+    .g3,.g2,.fgrid,.stats-grid,.two{grid-template-columns:1fr}
+    .stats-grid{gap:28px}
+    .hero .wrap{padding-bottom:56px;padding-top:88px}
+  }
+</style>
+</head>
+<body>
+
+<div class="proto">Design prototype &mdash; for review only. Nothing is saved.</div>
+
+<header>
+  <div class="wrap bar">
+    <a href="#home" data-page="home" class="logo" aria-label="Vertex Builders home">
+      <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true">
+        <path d="M15 2 28 27H2z" fill="none" stroke="#1c69d4" stroke-width="2.5"/>
+        <path d="M15 11l6.5 12.5h-13z" fill="#fff"/>
+      </svg>
+      Vertex
+    </a>
+    <nav>
+      <a href="#home" data-page="home">Home</a>
+      <a href="#projects" data-page="projects">Projects</a>
+      <a href="#services" data-page="services">Services</a>
+      <a href="#contact" data-page="contact">Contact</a>
+    </nav>
+    <button id="burger" aria-label="Menu" aria-expanded="false">
+      <svg width="20" height="14" viewBox="0 0 20 14" aria-hidden="true">
+        <path d="M0 1h20M0 7h20M0 13h20" stroke="currentColor" stroke-width="2"/>
+      </svg>
+    </button>
+  </div>
+</header>
+
+<main>
+
+<!-- ============ HOME ============ -->
+<section id="home" class="page">
+  <div class="hero">
+    <img src="images/hero.webp" alt="Structural steel framing on a Vertex Builders high-rise site">
+    <div class="wrap">
+      <p class="eyebrow">Since 2004 &middot; Quezon City</p>
+      <h1>We build what has to last</h1>
+      <p>General contracting, design-build and structural retrofit for commercial and
+         institutional clients across Metro Manila and Central Luzon. 180 projects
+         delivered, zero lost-time incidents in the last four years.</p>
+      <div class="hero-actions">
+        <a href="#projects" data-page="projects" class="btn">View our projects</a>
+        <a href="#contact" data-page="contact" class="btn btn-ghost">Request a quotation</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="wrap stats-grid">
+      <div class="stat"><b data-count="180">0</b><span>Projects delivered</span></div>
+      <div class="stat"><b data-count="21">0</b><span>Years in operation</span></div>
+      <div class="stat"><b data-count="340">0</b><span>Personnel &amp; trades</span></div>
+      <div class="stat"><b data-count="98">0</b><span>% On-time handover</span></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="wrap">
+      <div class="head">
+        <h2>What we do</h2>
+        <p class="lead">Four core capabilities, delivered in-house. We self-perform
+           structural and finishing works rather than sub-letting the critical path.</p>
+      </div>
+      <div class="grid g2">
+        <div class="svc"><div class="n">01</div><h3>General Contracting</h3>
+          <p>Full-scope execution from site mobilisation to turnover, with our own
+             formwork, rebar and finishing crews.</p></div>
+        <div class="svc"><div class="n">02</div><h3>Design&ndash;Build</h3>
+          <p>Single accountability for design and construction. One contract, one
+             programme, one point of responsibility.</p></div>
+        <div class="svc"><div class="n">03</div><h3>Structural Retrofit</h3>
+          <p>Seismic strengthening, jacketing and carbon-fibre wrapping for existing
+             structures under DPWH and ASEP guidelines.</p></div>
+        <div class="svc"><div class="n">04</div><h3>Project Management</h3>
+          <p>Owner-side programme, cost and quality control when you are running
+             multiple contractors.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="block alt">
+    <div class="wrap split">
+      <img src="images/about.webp" alt="Vertex Builders site engineers reviewing drawings on site">
+      <div>
+        <h2>Built by engineers, not brokers</h2>
+        <p class="lead">Vertex was founded by three structural engineers who were tired
+           of watching good drawings get value-engineered into problems. Every project
+           still gets a licensed engineer on site daily.</p>
+        <ul>
+          <li>PCAB Licence AAA &mdash; General Building, Category A</li>
+          <li>ISO 9001:2015 certified quality management</li>
+          <li>In-house safety officers, DOLE-accredited</li>
+          <li>Own fleet: 14 units including tower crane and concrete pumps</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PROJECTS (the page the client is judging) ============ -->
+<section id="projects" class="page" hidden>
+  <div class="block">
+    <div class="wrap">
+      <div class="head">
+        <p class="eyebrow">Portfolio</p>
+        <h2>Completed projects</h2>
+        <p class="lead">A selection of works completed between 2019 and 2026.
+           Filter by sector, or search by project name and location.</p>
+      </div>
+
+      <div class="searchrow">
+        <input id="search" type="search" placeholder="Search projects, location or client&hellip;"
+               aria-label="Search projects">
+        <span id="result-count"></span>
+      </div>
+
+      <div class="filters" role="group" aria-label="Filter projects by sector">
+        <button data-filter="all" class="active">All</button>
+        <button data-filter="commercial">Commercial</button>
+        <button data-filter="residential">Residential</button>
+        <button data-filter="institutional">Institutional</button>
+        <button data-filter="retrofit">Retrofit</button>
+      </div>
+
+      <!-- sorted newest first; each card's photo matches the project it describes -->
+      <div class="grid g3" id="project-grid">
+        <article class="card" data-tags="institutional">
+          <div class="ph"><img src="images/proj-3.webp" data-zoom
+            alt="St. Aurelius academic hall and library across the campus lawn"></div>
+          <div class="body">
+            <p class="tag">Institutional</p>
+            <h3>St. Aurelius Academic Hall</h3>
+            <p>Five-level lecture and library building in brick and cast stone, delivered
+               across two academic breaks to avoid class disruption.</p>
+            <div class="meta"><span>Quezon City</span><span>2025</span><span class="go">View &rarr;</span></div>
+          </div>
+        </article>
+        <article class="card" data-tags="commercial">
+          <div class="ph"><img src="images/proj-1.webp" data-zoom
+            alt="Meridian Corporate Centre curtain-wall tower in Ortigas"></div>
+          <div class="body">
+            <p class="tag">Commercial</p>
+            <h3>Meridian Corporate Centre</h3>
+            <p>22-storey office tower in the Ortigas CBD, with three basement levels,
+               post-tensioned slabs and a unitised curtain-wall envelope.</p>
+            <div class="meta"><span>Ortigas, Pasig</span><span>2024</span><span class="go">View &rarr;</span></div>
+          </div>
+        </article>
+        <article class="card" data-tags="residential">
+          <div class="ph"><img src="images/proj-2.webp" data-zoom
+            alt="Alvera Residences mid-rise block with glazed balconies"></div>
+          <div class="body">
+            <p class="tag">Residential</p>
+            <h3>Alvera Residences Phase 2</h3>
+            <p>Six-storey residential block, 84 units with glazed balconies, including
+               site development and drainage works.</p>
+            <div class="meta"><span>Marikina</span><span>2023</span><span class="go">View &rarr;</span></div>
+          </div>
+        </article>
+        <article class="card" data-tags="retrofit">
+          <div class="ph"><img src="images/proj-4.webp" data-zoom
+            alt="Pioneer distribution warehouse interior with high-bay racking"></div>
+          <div class="body">
+            <p class="tag">Retrofit</p>
+            <h3>Pioneer Warehouse Retrofit</h3>
+            <p>Seismic strengthening of a 1978 distribution warehouse &mdash; column
+               jacketing and new shear walls, completed while fully stocked and trading.</p>
+            <div class="meta"><span>Mandaluyong</span><span>2022</span><span class="go">View &rarr;</span></div>
+          </div>
+        </article>
+        <article class="card" data-tags="residential">
+          <div class="ph"><img src="images/proj-6.webp" data-zoom
+            alt="Hillcrest private residence at dusk, timber and dark cladding"></div>
+          <div class="body">
+            <p class="tag">Residential</p>
+            <h3>Hillcrest Private Residence</h3>
+            <p>Architect-led design-build of a 640 sqm two-storey residence on a sloping
+               lot, planned around an existing mature tree.</p>
+            <div class="meta"><span>Antipolo</span><span>2021</span><span class="go">View &rarr;</span></div>
+          </div>
+        </article>
+        <article class="card" data-tags="commercial">
+          <div class="ph"><img src="images/proj-5.webp" data-zoom
+            alt="Northgate café and lounge interior with exposed brick feature wall"></div>
+          <div class="body">
+            <p class="tag">Commercial</p>
+            <h3>Northgate Café &amp; Lounge Fit-out</h3>
+            <p>Interior fit-out of a café and lounge: exposed-brick feature walls,
+               new flooring and bespoke joinery, turned over in nine weeks.</p>
+            <div class="meta"><span>Bulacan</span><span>2020</span><span class="go">View &rarr;</span></div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SERVICES ============ -->
+<section id="services" class="page" hidden>
+  <div class="block">
+    <div class="wrap">
+      <div class="head">
+        <p class="eyebrow">Capabilities</p>
+        <h2>Services</h2>
+        <p class="lead">We take on work where engineering judgement matters more than
+           the lowest bid. If a project is purely price-driven, we will tell you early.</p>
+      </div>
+      <div class="grid g2">
+        <div class="svc"><div class="n">01</div><h3>General Contracting</h3>
+          <p>Lump-sum or cost-plus execution of architectural and structural works.
+             We self-perform concrete, rebar, formwork, masonry and finishing &mdash;
+             which is why our programmes hold.</p></div>
+        <div class="svc"><div class="n">02</div><h3>Design&ndash;Build</h3>
+          <p>Our in-house structural team works with your architect from concept, so
+             constructability problems get solved on paper instead of on site. One
+             contract, one programme.</p></div>
+        <div class="svc"><div class="n">03</div><h3>Structural Retrofit</h3>
+          <p>Assessment, modelling and strengthening of existing buildings: column and
+             beam jacketing, new shear walls, CFRP wrapping, foundation underpinning.
+             Most of our retrofit work is done in occupied buildings.</p></div>
+        <div class="svc"><div class="n">04</div><h3>Project &amp; Construction Management</h3>
+          <p>Owner-side representation: programme control, cost monitoring, variation
+             assessment and quality inspection across multiple contract packages.</p></div>
+        <div class="svc"><div class="n">05</div><h3>Site Development</h3>
+          <p>Earthworks, slope protection, drainage, pavement and utilities for
+             subdivision and industrial estates.</p></div>
+        <div class="svc"><div class="n">06</div><h3>Fit-out &amp; Renovation</h3>
+          <p>Office, clinic and retail fit-out delivered on compressed night and weekend
+             schedules in occupied buildings.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CONTACT ============ -->
+<section id="contact" class="page" hidden>
+  <div class="block">
+    <div class="wrap">
+      <div class="head">
+        <p class="eyebrow">Get in touch</p>
+        <h2>Request a quotation</h2>
+        <p class="lead">Send us the scope and we will come back within one business day.
+           For bid invitations, attach the plans and we will confirm participation in 48 hours.</p>
+      </div>
+      <div class="split" style="align-items:start">
+        <form data-fake novalidate="false">
+          <div class="two">
+            <div><label for="n">Full name</label>
+              <input id="n" name="name" required placeholder="Juan Dela Cruz"></div>
+            <div><label for="c">Company</label>
+              <input id="c" name="company" placeholder="Optional"></div>
+          </div>
+          <div class="two">
+            <div><label for="e">Email</label>
+              <input id="e" name="email" type="email" required placeholder="you@company.com"></div>
+            <div><label for="p">Mobile</label>
+              <input id="p" name="phone" type="tel" required placeholder="0917 000 0000"></div>
+          </div>
+          <div><label for="s">Type of work</label>
+            <select id="s" name="service" required>
+              <option value="">Select one&hellip;</option>
+              <option>General contracting</option>
+              <option>Design&ndash;build</option>
+              <option>Structural retrofit</option>
+              <option>Project management</option>
+              <option>Site development</option>
+              <option>Fit-out / renovation</option>
+            </select></div>
+          <div><label for="m">Project details</label>
+            <textarea id="m" name="message" required
+              placeholder="Location, approximate floor area, target start date&hellip;"></textarea></div>
+          <button class="btn" type="submit">Send enquiry</button>
+          <p class="form-success" role="status" hidden></p>
+        </form>
+        <dl class="info">
+          <div><dt>Office</dt><dd>Unit 1204, Vertex Corporate Centre<br>
+            128 Katipunan Avenue, Quezon City 1108</dd></div>
+          <div><dt>Telephone</dt><dd>(02) 8712-4400<br>(02) 8712-4401</dd></div>
+          <div><dt>Mobile</dt><dd>0917 842 6630</dd></div>
+          <div><dt>Email</dt><dd>projects@vertexbuilders.ph<br>bids@vertexbuilders.ph</dd></div>
+          <div><dt>Office hours</dt><dd>Monday to Friday, 8:00 AM &ndash; 6:00 PM<br>
+            Saturday, 8:00 AM &ndash; 12:00 NN</dd></div>
+        </dl>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="fgrid">
+      <div>
+        <h4>Vertex Builders &amp; Development Corp</h4>
+        <p>General contracting, design&ndash;build and structural retrofit.
+           PCAB Licence AAA. ISO 9001:2015 certified.<br>
+           Unit 1204, Vertex Corporate Centre, 128 Katipunan Avenue, Quezon City.</p>
+      </div>
+      <div>
+        <h4>Navigate</h4>
+        <ul>
+          <li><a href="#home" data-page="home">Home</a></li>
+          <li><a href="#projects" data-page="projects">Projects</a></li>
+          <li><a href="#services" data-page="services">Services</a></li>
+          <li><a href="#contact" data-page="contact">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <ul>
+          <li>(02) 8712-4400</li>
+          <li>0917 842 6630</li>
+          <li>projects@vertexbuilders.ph</li>
+        </ul>
+      </div>
+    </div>
+    <div class="fbot">
+      <span>&copy; 2026 Vertex Builders &amp; Development Corp.</span>
+      <span>Design prototype &mdash; not a live website.</span>
+    </div>
+  </div>
+</footer>
+
+<div id="lightbox" hidden><img alt=""></div>
+
+<script>
+/* ---- page switching ---- */
+function show(page){
+  document.querySelectorAll('.page').forEach(s => s.hidden = s.id !== page);
+  document.querySelectorAll('nav [data-page]').forEach(a =>
+    a.classList.toggle('active', a.dataset.page === page));
+  document.body.classList.remove('nav-open');
+  window.scrollTo(0,0);
+}
+document.querySelectorAll('[data-page]').forEach(a =>
+  a.addEventListener('click', e => { e.preventDefault(); show(a.dataset.page); }));
+show(location.hash.slice(1) || 'home');
+
+/* ---- mobile menu ---- */
+var burger = document.querySelector('#burger');
+burger.addEventListener('click', function(){
+  var open = document.body.classList.toggle('nav-open');
+  burger.setAttribute('aria-expanded', open);
+});
+
+/* ---- fake form submit ---- */
+document.querySelectorAll('form[data-fake]').forEach(function(form){
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    if (!form.reportValidity()) return;
+    var ok = form.querySelector('.form-success');
+    form.querySelectorAll('input,textarea,select,button').forEach(function(el){ el.disabled = true; });
+    ok.hidden = false;
+    ok.textContent = 'Thank you. Your enquiry has been received \u2014 our projects team will reply within one business day.';
+    ok.scrollIntoView({block:'center'});
+  });
+});
+
+/* ---- project filter + search ---- */
+var items = [].slice.call(document.querySelectorAll('#project-grid [data-tags]'));
+var q = document.querySelector('#search');
+function apply(){
+  var term = q.value.trim().toLowerCase();
+  var btn = document.querySelector('.filters button.active');
+  var tag = btn ? btn.dataset.filter : 'all';
+  items.forEach(function(el){
+    var matchTag = tag === 'all' || el.dataset.tags.indexOf(tag) > -1;
+    var matchTerm = !term || el.textContent.toLowerCase().indexOf(term) > -1;
+    el.hidden = !(matchTag && matchTerm);
+  });
+  var shown = items.filter(function(el){ return !el.hidden; }).length;
+  document.querySelector('#result-count').textContent =
+    shown ? shown + (shown > 1 ? ' projects' : ' project') : 'No projects match your search';
+}
+q.addEventListener('input', apply);
+document.querySelectorAll('.filters button').forEach(function(b){
+  b.addEventListener('click', function(){
+    document.querySelectorAll('.filters button').forEach(function(x){ x.classList.remove('active'); });
+    b.classList.add('active');
+    apply();
+  });
+});
+apply();
+
+/* ---- lightbox: card click or photo click both open it ---- */
+var box = document.querySelector('#lightbox');
+function openBox(img){
+  box.querySelector('img').src = img.src;
+  box.querySelector('img').alt = img.alt;
+  box.hidden = false;
+}
+document.querySelectorAll('[data-zoom]').forEach(function(img){
+  img.style.cursor = 'zoom-in';
+  img.addEventListener('click', function(e){ e.stopPropagation(); openBox(img); });
+});
+document.querySelectorAll('#project-grid .card').forEach(function(card){
+  card.addEventListener('click', function(){ openBox(card.querySelector('[data-zoom]')); });
+});
+box.addEventListener('click', function(){ box.hidden = true; });
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape') box.hidden = true; });
+
+/* ---- stat counters ---- */
+document.querySelectorAll('[data-count]').forEach(function(el){
+  new IntersectionObserver(function(entries, obs){
+    entries.forEach(function(e){
+      if (!e.isIntersecting) return;
+      var target = +el.dataset.count, n = 0;
+      (function step(){
+        n = Math.min(target, n + Math.ceil(target / 40));
+        el.textContent = n.toLocaleString();
+        if (n < target) requestAnimationFrame(step);
+      })();
+      obs.unobserve(el);
+    });
+  }, {threshold:0.4}).observe(el);
+});
+
+/* ---- build-time self-check (remove before sending) ---- */
+console.assert([].slice.call(document.querySelectorAll('[data-page]'))
+  .every(function(a){ return document.getElementById(a.dataset.page); }),
+  'nav link points at a missing section');
+console.assert([].slice.call(document.images)
+  .every(function(i){ return i.getAttribute('src').indexOf('http') !== 0; }),
+  'remote image URL left in the file - it will break offline');
+</script>
+</body>
+</html>

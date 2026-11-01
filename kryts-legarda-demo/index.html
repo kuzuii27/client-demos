@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<!-- PROTOTYPE for Kryts - Legarda - throwaway demo built by SSD GPS Corporation.
+     Not production code. All products, prices and stock numbers are SAMPLE DATA
+     for layout review only. Nothing is saved; no server, no database. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kryts Legarda - TopBox, Bracket at Helmet | Order Online</title>
+<style>
+:root{
+  /* Palette taken from their Legarda storefront sign: black box, red oval, white script */
+  --black:#0d0d0d; --ink:#1a1a1a; --surface:#141414; --card:#1b1b1b;
+  --red:#e30613; --red-dark:#b20410; --red-glow:rgba(227,6,19,.35);
+  --white:#ffffff; --silver:#c7c7c7; --grey:#8d8d8d; --grey-line:#303030;
+  --paper:#f4f4f4; --paper-line:#dcdcdc;
+  --ok:#2f9e44; --warn:#f2a40c;
+  --radius:2px;                     /* NVIDIA system: sharp, 1-2px only */
+  --nav-h:64px;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --shadow:0 0 5px rgba(0,0,0,.3);
+  --shadow-lift:0 6px 22px rgba(0,0,0,.45);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 16px/1.5 var(--sans);
+     -webkit-font-smoothing:antialiased}
+img{display:block;max-width:100%}
+a{color:inherit}
+h1,h2,h3,h4{margin:0;line-height:1.25;font-weight:700}
+button{font:inherit;cursor:pointer;border:none;background:none;color:inherit}
+:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+[hidden]{display:none !important}      /* must outrank the component rules below */
+.wrap{max-width:1200px;margin:0 auto;padding:0 20px}
+
+/* ---------- demo ribbon ---------- */
+.ribbon{background:var(--warn);color:#241a00;font-size:12.5px;font-weight:700;
+  text-align:center;padding:7px 14px;letter-spacing:.02em}
+
+/* ---------- nav ---------- */
+header{position:sticky;top:0;z-index:60;background:var(--black);color:var(--white);
+  border-bottom:1px solid var(--grey-line)}
+.navbar{display:flex;align-items:center;gap:18px;height:var(--nav-h)}
+.logo{display:flex;align-items:center;gap:10px;flex-shrink:0;background:none;padding:0}
+.logo .oval{display:grid;place-items:center;width:78px;height:38px;border:2px solid var(--red);
+  border-radius:50%/50%;font:700 21px/1 Georgia,"Times New Roman",serif;font-style:italic;
+  letter-spacing:.01em;color:var(--white)}
+.logo .sub{font-size:10px;letter-spacing:.34em;font-weight:700;color:var(--silver);text-transform:uppercase}
+nav{display:flex;gap:4px;margin-left:auto}
+nav a{font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.02em;
+  text-decoration:none;padding:10px 13px;color:var(--white);border-bottom:2px solid transparent}
+nav a:hover{color:var(--red)}
+nav a.active{border-bottom-color:var(--red)}
+.cart-btn{display:flex;align-items:center;gap:8px;border:2px solid var(--red);padding:9px 14px;
+  border-radius:var(--radius);font-size:14px;font-weight:700;text-transform:uppercase;
+  background:transparent;color:var(--white);transition:background .15s,color .15s}
+.cart-btn:hover{background:var(--red);color:#fff}
+.cart-btn .badge{min-width:22px;height:22px;display:grid;place-items:center;background:#fff;
+  color:var(--black);border-radius:11px;font-size:12px;font-weight:700;padding:0 6px}
+.cart-btn:hover .badge{background:var(--black);color:#fff}
+#burger{display:none;margin-left:auto;padding:10px;border:1px solid var(--grey-line);border-radius:var(--radius)}
+#burger svg{display:block}
+
+/* ---------- buttons ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:13px 22px;border-radius:var(--radius);font-size:16px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.01em;text-decoration:none;transition:.15s;
+  min-height:46px;border:2px solid transparent}
+.btn-primary{background:var(--red);color:#fff;border-color:var(--red)}
+.btn-primary:hover{background:#fff;color:var(--red)}
+.btn-ghost{background:transparent;color:var(--white);border-color:var(--red)}
+.btn-ghost:hover{background:var(--red);color:#fff}
+.btn-dark{background:var(--black);color:#fff;border-color:var(--black)}
+.btn-dark:hover{background:var(--red);border-color:var(--red)}
+.btn-block{width:100%}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+
+/* ---------- hero ---------- */
+.hero{position:relative;background:var(--black);color:var(--white);overflow:hidden}
+.hero-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:62% 46%}
+.hero-scrim{position:absolute;inset:0;
+  background:linear-gradient(90deg,rgba(13,13,13,.97) 0%,rgba(13,13,13,.93) 46%,rgba(13,13,13,.45) 100%)}
+.hero-inner{position:relative;padding:58px 0 62px;min-height:min(430px,calc(100vh - var(--nav-h) - 90px));
+  display:flex;flex-direction:column;justify-content:center}
+.kicker{display:inline-flex;align-items:center;gap:9px;font-size:11px;font-weight:700;
+  letter-spacing:.22em;text-transform:uppercase;color:#ff2d3b;margin-bottom:16px}
+.kicker::before{content:"";width:26px;height:2px;background:#ff2d3b}
+.hero h1{font-size:clamp(30px,5.1vw,52px);max-width:16ch;letter-spacing:-.015em;text-wrap:balance}
+.hero h1 em{font-style:normal;color:#ff2d3b}
+.hero p{max-width:46ch;color:#dcdcdc;font-size:17px;margin:16px 0 26px}
+.hero-cta{display:flex;flex-wrap:wrap;gap:12px}
+.trust{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:34px;
+  padding-top:22px;border-top:1px solid rgba(255,255,255,.14);max-width:430px}
+.trust div span{display:block;font-size:26px;font-weight:700;color:var(--white)}
+.trust div small{font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--grey);font-weight:700}
+
+/* ---------- strip ---------- */
+.strip{background:var(--ink);color:var(--silver);border-top:1px solid var(--grey-line)}
+.strip ul{list-style:none;margin:0;padding:16px 0;display:grid;gap:12px;
+  grid-template-columns:repeat(auto-fit,minmax(215px,1fr))}
+.strip li{display:flex;align-items:center;gap:10px;font-size:13.5px;font-weight:700}
+.strip svg{flex-shrink:0;color:var(--red)}
+
+/* ---------- sections ---------- */
+section.page{padding:0 0 70px}
+.section-head{padding:46px 0 22px}
+.section-head h2{font-size:clamp(23px,3.2vw,33px);letter-spacing:-.01em}
+.section-head p{color:#5b5b5b;max-width:62ch;margin:10px 0 0}
+
+/* ---------- shop toolbar ---------- */
+.toolbar{position:sticky;top:var(--nav-h);z-index:40;background:var(--paper);
+  padding:12px 0;border-bottom:1px solid var(--paper-line)}
+.toolbar-inner{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--paper-line);background:#fff;padding:9px 15px;border-radius:var(--radius);
+  font-size:13.5px;font-weight:700;text-transform:uppercase;letter-spacing:.02em;min-height:40px;
+  transition:.12s}
+.chip:hover{border-color:var(--black)}
+.chip.active{background:var(--black);color:#fff;border-color:var(--black)}
+.search-box{position:relative;margin-left:auto;min-width:238px;flex:1 1 238px;max-width:330px}
+.search-box svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--grey)}
+.search-box input{width:100%;padding:11px 12px 11px 38px;border:1px solid var(--paper-line);
+  background:#fff;border-radius:var(--radius);font-size:15px;min-height:42px}
+.search-box input:focus{border-color:var(--black);outline:none;box-shadow:0 0 0 2px rgba(0,0,0,.08)}
+#result-count{font-size:13px;font-weight:700;color:#5b5b5b;text-transform:uppercase;letter-spacing:.06em}
+
+/* ---------- product grid ---------- */
+.grid{display:grid;gap:18px;grid-template-columns:repeat(auto-fill,minmax(236px,1fr));margin-top:26px}
+.card{background:#fff;border:1px solid var(--paper-line);border-radius:var(--radius);
+  display:flex;flex-direction:column;overflow:hidden;transition:box-shadow .16s,transform .16s;
+  box-shadow:var(--shadow)}
+.card:hover{box-shadow:var(--shadow-lift);transform:translateY(-2px)}
+.card-media{position:relative;aspect-ratio:4/3;background:#ececec;overflow:hidden;cursor:pointer}
+.card-media img{width:100%;height:100%;object-fit:cover;transition:transform .35s}
+.card:hover .card-media img{transform:scale(1.045)}
+.tag{position:absolute;top:10px;left:10px;background:var(--red);color:#fff;font-size:10.5px;
+  font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:5px 9px;border-radius:var(--radius)}
+.tag.out{background:#555}
+.card-body{padding:15px;display:flex;flex-direction:column;flex:1;gap:4px}
+.cat{font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--grey)}
+.card-body h3{font-size:16px;letter-spacing:-.005em}
+.fit{font-size:12.5px;color:#6a6a6a;line-height:1.45}
+.price-row{display:flex;align-items:baseline;gap:9px;margin-top:10px}
+.price{font-size:22px;font-weight:700;letter-spacing:-.02em}
+.was{font-size:14px;color:var(--grey);text-decoration:line-through}
+.card-actions{display:flex;gap:8px;margin-top:12px}
+.card-actions .btn{flex:1;padding:11px 12px;font-size:13.5px}
+.view-link{border:1px solid var(--paper-line);background:#fff;border-radius:var(--radius);
+  padding:11px 13px;font-size:13.5px;font-weight:700;text-transform:uppercase;min-height:44px}
+.view-link:hover{border-color:var(--black)}
+.empty{grid-column:1/-1;background:#fff;border:1px dashed var(--paper-line);padding:46px 24px;
+  text-align:center;color:#5b5b5b}
+.empty strong{display:block;font-size:19px;color:var(--ink);margin-bottom:6px}
+
+/* ---------- modal (product detail + cart + lightbox) ---------- */
+.overlay{position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.78);
+  display:flex;align-items:center;justify-content:center;padding:18px}
+.sheet{background:#fff;border-radius:var(--radius);width:100%;max-width:900px;
+  max-height:92vh;overflow:auto;position:relative}
+.sheet-close{position:absolute;top:10px;right:10px;z-index:2;width:44px;height:44px;border-radius:var(--radius);
+  background:rgba(13,13,13,.86);color:#fff;display:grid;place-items:center;font-size:22px;line-height:1}
+.sheet-close:hover{background:var(--red)}
+.detail{display:grid;grid-template-columns:1fr 1fr}
+.detail-media{background:#111;aspect-ratio:1/1;display:grid;place-items:center;overflow:hidden}
+.detail-media img{width:100%;height:100%;object-fit:cover}
+.detail-body{padding:30px 28px}
+.detail-body h3{font-size:25px;margin:6px 0 10px}
+.detail-price{font-size:31px;font-weight:700;letter-spacing:-.02em;margin:14px 0 4px}
+.spec{list-style:none;margin:18px 0 0;padding:0;border-top:1px solid var(--paper-line)}
+.spec li{display:flex;justify-content:space-between;gap:14px;padding:10px 0;
+  border-bottom:1px solid var(--paper-line);font-size:14px}
+.spec li span:first-child{color:var(--grey);font-weight:700;text-transform:uppercase;
+  font-size:11px;letter-spacing:.1em}
+.qty{display:flex;align-items:center;gap:0;margin:18px 0}
+.qty button{width:44px;height:44px;border:1px solid var(--paper-line);background:#fff;font-size:19px;font-weight:700}
+.qty button:hover{border-color:var(--black)}
+.qty input{width:62px;height:44px;text-align:center;border:1px solid var(--paper-line);
+  border-left:none;border-right:none;font:700 16px var(--sans)}
+
+/* ---------- cart ---------- */
+.cart-sheet{max-width:560px}
+.cart-head{padding:22px 24px;border-bottom:1px solid var(--paper-line);background:var(--black);color:#fff}
+.cart-head h3{font-size:19px;text-transform:uppercase;letter-spacing:.04em}
+#cart-items{list-style:none;margin:0;padding:0}
+#cart-items li{display:flex;gap:13px;align-items:center;padding:14px 24px;border-bottom:1px solid var(--paper-line)}
+#cart-items li.empty-row{display:block;text-align:center;color:#6a6a6a;padding:44px 24px;border:none}
+#cart-items img{width:62px;height:62px;object-fit:cover;border:1px solid var(--paper-line);flex-shrink:0}
+.ci-main{flex:1;min-width:0}
+.ci-main strong{display:block;font-size:14.5px;font-weight:700}
+.ci-main small{color:var(--grey);font-size:12.5px}
+.ci-price{font-weight:700;white-space:nowrap}
+.ci-remove{width:36px;height:36px;border:1px solid var(--paper-line);border-radius:var(--radius);
+  color:var(--grey);font-size:17px;line-height:1}
+.ci-remove:hover{border-color:var(--red);color:var(--red)}
+.cart-foot{padding:20px 24px;background:#fafafa;border-top:1px solid var(--paper-line)}
+.totals{font-size:14.5px}
+.totals div{display:flex;justify-content:space-between;padding:5px 0}
+.totals .grand{border-top:1px solid var(--paper-line);margin-top:8px;padding-top:11px;
+  font-size:20px;font-weight:700}
+.note{font-size:12.5px;color:#6a6a6a;margin:12px 0 0}
+
+/* ---------- checkout ---------- */
+.checkout{display:grid;grid-template-columns:1.25fr .9fr;gap:34px;align-items:start}
+.panel{background:#fff;border:1px solid var(--paper-line);border-radius:var(--radius);
+  padding:26px;box-shadow:var(--shadow)}
+.panel h3{font-size:18px;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
+.panel > p{color:#5b5b5b;font-size:14px;margin:0 0 20px}
+.field{margin-bottom:15px}
+.field label{display:block;font-size:11.5px;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;color:#4a4a4a;margin-bottom:6px}
+.field input,.field select,.field textarea{width:100%;padding:12px 13px;border:1px solid var(--paper-line);
+  border-radius:var(--radius);font:400 15px var(--sans);background:#fff;min-height:46px}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--black);outline:none;
+  box-shadow:0 0 0 2px rgba(0,0,0,.08)}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+.pay{display:grid;gap:10px}
+.pay label{display:flex;gap:12px;align-items:flex-start;border:1px solid var(--paper-line);
+  border-radius:var(--radius);padding:14px;cursor:pointer;transition:.12s;min-height:46px}
+.pay label:hover{border-color:var(--black)}
+.pay input{margin-top:3px;width:18px;height:18px;accent-color:var(--red);flex-shrink:0}
+.pay strong{display:block;font-size:14.5px}
+.pay small{color:#6a6a6a;font-size:12.5px}
+.pay input:checked + div strong{color:var(--red)}
+.order-sum{position:sticky;top:calc(var(--nav-h) + 18px)}
+.order-sum ul{list-style:none;margin:0 0 14px;padding:0}
+.order-sum ul li{display:flex;justify-content:space-between;gap:12px;font-size:14px;padding:7px 0;
+  border-bottom:1px solid var(--paper-line)}
+.form-success{background:#eaf7ec;border:1px solid var(--ok);color:#17521f;padding:22px;
+  border-radius:var(--radius);margin-top:18px}
+.form-success h4{font-size:18px;margin-bottom:8px}
+.form-success code{background:#fff;border:1px solid var(--ok);padding:3px 9px;font-weight:700;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+
+/* ---------- steps ---------- */
+.steps{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(228px,1fr));margin-top:8px}
+.step{background:#fff;border:1px solid var(--paper-line);border-radius:var(--radius);padding:24px;
+  box-shadow:var(--shadow)}
+.step .num{display:grid;place-items:center;width:42px;height:42px;background:var(--black);color:#fff;
+  font-size:19px;font-weight:700;border-radius:var(--radius);margin-bottom:14px}
+.step h3{font-size:17px;margin-bottom:7px}
+.step p{color:#5b5b5b;font-size:14.5px;margin:0}
+.faq{margin-top:38px;max-width:820px}
+.faq details{background:#fff;border:1px solid var(--paper-line);border-radius:var(--radius);
+  padding:16px 18px;margin-bottom:10px}
+.faq summary{font-weight:700;cursor:pointer;font-size:15.5px;list-style:none;
+  display:flex;justify-content:space-between;gap:14px;min-height:28px;align-items:center}
+.faq summary::after{content:"+";color:var(--red);font-size:21px;font-weight:700;line-height:1}
+.faq details[open] summary::after{content:"\2212"}
+.faq p{color:#5b5b5b;font-size:14.5px;margin:12px 0 0}
+
+/* ---------- about ---------- */
+.split{display:grid;grid-template-columns:1.05fr .95fr;gap:38px;align-items:center}
+.split img{border:1px solid var(--paper-line);border-radius:var(--radius);width:100%;
+  aspect-ratio:4/3;object-fit:cover;cursor:zoom-in}
+.split p{color:#4c4c4c;margin:0 0 14px}
+.badges{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+.badges span{border:1px solid var(--paper-line);background:#fff;padding:8px 13px;border-radius:var(--radius);
+  font-size:12.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+.contact-grid{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));margin-top:34px}
+.gallery{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));margin-top:30px}
+.gallery img{aspect-ratio:4/3;object-fit:cover;border:1px solid var(--paper-line);
+  border-radius:var(--radius);cursor:zoom-in;transition:.16s}
+.gallery img:hover{box-shadow:var(--shadow-lift);transform:translateY(-2px)}
+#lightbox img{max-width:min(94vw,1000px);max-height:88vh;width:auto;object-fit:contain}
+
+/* ---------- footer ---------- */
+footer{background:var(--black);color:var(--silver);padding:46px 0 26px;font-size:14px}
+.foot-grid{display:grid;gap:30px;grid-template-columns:1.3fr 1fr 1fr 1fr}
+footer h4{color:#fff;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:14px}
+footer ul{list-style:none;margin:0;padding:0}
+footer li{margin-bottom:2px}
+footer a{text-decoration:none;display:inline-flex;align-items:center;min-height:34px;padding:4px 0}
+footer li.placeholder{min-height:34px;display:flex;align-items:center}
+footer a:hover{color:var(--red)}
+.placeholder{color:var(--warn);font-size:12.5px}
+.foot-bottom{border-top:1px solid var(--grey-line);margin-top:34px;padding-top:20px;
+  font-size:12.5px;color:var(--grey);display:flex;flex-wrap:wrap;gap:14px;justify-content:space-between}
+
+/* ---------- toast ---------- */
+#toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,16px);z-index:95;
+  background:var(--black);color:#fff;border-left:4px solid var(--red);padding:14px 20px;
+  border-radius:var(--radius);font-size:14.5px;font-weight:700;box-shadow:var(--shadow-lift);
+  opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;max-width:90vw}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* ---------- responsive ---------- */
+@media (max-width:860px){
+  .checkout,.split{grid-template-columns:1fr}
+  .detail{grid-template-columns:1fr}
+  .detail-media{aspect-ratio:16/10}
+  .foot-grid{grid-template-columns:1fr 1fr}
+  .order-sum{position:static}
+}
+@media (max-width:768px){
+  #burger{display:block}
+  nav{display:none;position:absolute;top:var(--nav-h);left:0;right:0;flex-direction:column;
+      background:var(--black);border-bottom:1px solid var(--grey-line);padding:8px 14px 16px;margin:0}
+  .nav-open nav{display:flex}
+  nav a{padding:14px 6px;border-bottom:1px solid var(--grey-line)}
+  nav a.active{border-bottom-color:var(--red)}
+  .navbar{gap:10px}
+  .cart-btn{order:3;padding:9px 11px;font-size:13px}
+  .cart-btn span.label{display:none}
+  .hero-scrim{background:linear-gradient(180deg,rgba(13,13,13,.72) 0%,rgba(13,13,13,.93) 62%)}
+  .hero-inner{padding:40px 0 44px}
+  .trust{gap:20px}
+  .trust div span{font-size:21px}
+  .field-row{grid-template-columns:1fr}
+  .detail-body{padding:24px 20px}
+}
+</style>
+</head>
+<body>
+
+<div class="ribbon">DEMO PROTOTYPE &mdash; sample products and prices for design review only. Nothing is ordered or saved.</div>
+
+<header>
+  <div class="wrap navbar">
+    <button class="logo" data-page="shop" aria-label="Kryts Legarda - go to shop">
+      <span class="oval">Kryts</span>
+      <span class="sub">Legarda</span>
+    </button>
+    <button id="burger" aria-label="Menu" aria-expanded="false">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+    </button>
+    <nav>
+      <a href="#shop" data-page="shop">Shop</a>
+      <a href="#how" data-page="how">How to Order</a>
+      <a href="#about" data-page="about">About</a>
+      <a href="#contact" data-page="contact">Contact</a>
+    </nav>
+    <button class="cart-btn" id="open-cart">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4H6zM3 6h18M16 10a4 4 0 0 1-8 0"/></svg>
+      <span class="label">Cart</span><span class="badge" id="cart-count">0</span>
+    </button>
+  </div>
+</header>
+
+<main>
+
+<!-- ================= SHOP ================= -->
+<section id="shop" class="page">
+  <div class="hero">
+    <img class="hero-img" src="images/install.webp" alt="Motorcycle fitted with a rear top box, with a full-face helmet resting on the seat">
+    <div class="hero-scrim"></div>
+    <div class="wrap hero-inner">
+      <span class="kicker">Legarda, Sampaloc &middot; Manila</span>
+      <h1>Pinaka murang TopBox, Bracket at <em>Helmet</em>.</h1>
+      <p>Kryts Legarda is now taking orders on our own website. Same shop, same
+         prices &mdash; order online, cash on delivery or GCash, delivered nationwide.</p>
+      <div class="hero-cta">
+        <a class="btn btn-primary" href="#shop" data-scroll="catalog">Shop now</a>
+        <a class="btn btn-ghost" href="#how" data-page="how">How to order</a>
+      </div>
+      <div class="trust">
+        <div><span>290K+</span><small>Followers</small></div>
+        <div><span>96%</span><small>Recommend us</small></div>
+        <div><span>COD</span><small>Nationwide</small></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="strip">
+    <div class="wrap">
+      <ul>
+        <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 6 9 17l-5-5"/></svg> Legit at murang presyo, walang tawad kailangan</li>
+        <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M1 3h15v13H1zM16 8h4l3 3v5h-7M5.5 19a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zM18.5 19a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/></svg> Ships via J&amp;T, LBC or Lalamove</li>
+        <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2 4 6v6c0 5 3.4 9.3 8 10 4.6-.7 8-5 8-10V6l-8-4z"/></svg> Free bracket fitting sa shop</li>
+        <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Chat us for bulk / reseller pricing</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="wrap section-head" id="catalog">
+    <h2>Shop by category</h2>
+    <p>Top boxes, brackets, helmets and riding essentials. Every bracket is listed
+       with the motorcycle models it fits, so hindi na kayo magtatanong sa comments.</p>
+  </div>
+
+  <div class="toolbar">
+    <div class="wrap toolbar-inner">
+      <div class="chips">
+        <button class="chip active" data-filter="all">All</button>
+        <button class="chip" data-filter="topbox">Top boxes</button>
+        <button class="chip" data-filter="bracket">Brackets</button>
+        <button class="chip" data-filter="helmet">Helmets</button>
+        <button class="chip" data-filter="gear">Gear &amp; lights</button>
+      </div>
+      <div class="search-box">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input id="search" type="search" placeholder="Search e.g. 45L, Click 125, full face" aria-label="Search products">
+      </div>
+      <span id="result-count" role="status"></span>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="grid" id="product-grid"></div>
+  </div>
+</section>
+
+<!-- ================= CHECKOUT ================= -->
+<section id="checkout" class="page" hidden>
+  <div class="wrap section-head">
+    <h2>Checkout</h2>
+    <p>Fill in your delivery details. We confirm every order by text or Messenger
+       before we ship it out.</p>
+  </div>
+  <div class="wrap">
+    <div class="checkout">
+      <form class="panel" id="order-form" novalidate>
+        <h3>Delivery details</h3>
+        <p>Siguraduhin tama ang number &mdash; dyan namin ichecheck ang order.</p>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="f-name">Full name</label>
+            <input id="f-name" name="name" required placeholder="Juan Dela Cruz">
+          </div>
+          <div class="field">
+            <label for="f-phone">Mobile number</label>
+            <input id="f-phone" name="phone" type="tel" required pattern="(09|\+639)[0-9\s\-]{9,13}" placeholder="0917 123 4567">
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="f-addr">Complete delivery address</label>
+          <textarea id="f-addr" name="address" rows="3" required placeholder="House/unit no., street, barangay, city, province"></textarea>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="f-city">City / Municipality</label>
+            <input id="f-city" name="city" required placeholder="Manila">
+          </div>
+          <div class="field">
+            <label for="f-courier">Preferred courier</label>
+            <select id="f-courier" name="courier" required>
+              <option value="">Choose a courier</option>
+              <option>J&amp;T Express (2-5 days)</option>
+              <option>LBC (2-4 days)</option>
+              <option>Lalamove - Metro Manila same day</option>
+              <option>Pick up sa shop (Legarda)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="f-bike">Motorcycle model (for bracket fitting)</label>
+          <input id="f-bike" name="bike" placeholder="e.g. Honda Click 125i 2022 - optional">
+        </div>
+
+        <h3 style="margin-top:28px">Payment</h3>
+        <p>Walang hidden fees. COD is collected by the courier on delivery.</p>
+        <div class="pay">
+          <label>
+            <input type="radio" name="payment" value="cod" required checked>
+            <div><strong>Cash on Delivery (COD)</strong>
+              <small>Pay the courier when your parcel arrives. Available nationwide.</small></div>
+          </label>
+          <label>
+            <input type="radio" name="payment" value="gcash">
+            <div><strong>GCash</strong>
+              <small>Send payment to our GCash number, then upload the receipt in chat.</small></div>
+          </label>
+          <label>
+            <input type="radio" name="payment" value="pickup">
+            <div><strong>Pay sa shop</strong>
+              <small>Reserve online, bayad pagkuha sa Legarda branch.</small></div>
+          </label>
+        </div>
+
+        <div class="field" style="margin-top:22px">
+          <label for="f-notes">Notes for the rider (optional)</label>
+          <input id="f-notes" name="notes" placeholder="Landmark, gate code, best time to deliver">
+        </div>
+
+        <button class="btn btn-primary btn-block" type="submit" style="margin-top:10px">Place order</button>
+        <p class="note">By placing an order you agree to our exchange policy &mdash;
+           unused items in original packaging within 7 days.</p>
+        <div class="form-success" role="status" hidden></div>
+      </form>
+
+      <aside class="panel order-sum">
+        <h3>Your order</h3>
+        <p><span id="sum-count">0</span> item(s)</p>
+        <ul id="sum-items"></ul>
+        <div class="totals">
+          <div><span>Subtotal</span><span id="sum-subtotal">&#8369;0</span></div>
+          <div><span>Shipping (est.)</span><span id="sum-ship">&#8369;0</span></div>
+          <div class="grand"><span>Total</span><span id="sum-total">&#8369;0</span></div>
+        </div>
+        <button class="btn btn-dark btn-block" data-page="shop" style="margin-top:18px">Continue shopping</button>
+        <p class="note">Shipping is a flat sample rate in this prototype.
+           Real rates depend on the courier and your province.</p>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ================= HOW TO ORDER ================= -->
+<section id="how" class="page" hidden>
+  <div class="wrap section-head">
+    <h2>How to order</h2>
+    <p>Four steps. No app to install, no Shopee account needed.</p>
+  </div>
+  <div class="wrap">
+    <div class="steps">
+      <div class="step"><div class="num">1</div><h3>Pick your items</h3>
+        <p>Browse the shop and add to cart. Filter by top box, bracket, helmet or gear.</p></div>
+      <div class="step"><div class="num">2</div><h3>Enter your details</h3>
+        <p>Name, mobile number, complete address and your motorcycle model if you are buying a bracket.</p></div>
+      <div class="step"><div class="num">3</div><h3>Choose COD or GCash</h3>
+        <p>COD is collected by the courier. For GCash we send the number and you upload the receipt.</p></div>
+      <div class="step"><div class="num">4</div><h3>We confirm and ship</h3>
+        <p>We text or message you to confirm, then ship the same day for orders before 3PM.</p></div>
+    </div>
+
+    <div class="faq">
+      <h3 style="font-size:20px;margin-bottom:16px">Mga madalas itanong</h3>
+      <details open><summary>Magkano ang shipping?</summary>
+        <p>This prototype shows a flat sample rate. On the live site we will plug in
+           the real J&amp;T and LBC rates per province, or Lalamove for same-day Metro Manila.</p></details>
+      <details><summary>Paano ko malalaman kung kasya ang bracket sa motor ko?</summary>
+        <p>Every bracket listing names the models it fits. If your model is not listed,
+           message us &mdash; we fabricate custom brackets sa shop.</p></details>
+      <details><summary>May warranty ba ang helmet at top box?</summary>
+        <p>Replacement for manufacturing defects within 7 days, unused and in the original box.
+           Final terms to be confirmed by the shop owner.</p></details>
+      <details><summary>Pwede ba akong mag-pick up sa Legarda?</summary>
+        <p>Yes. Choose &ldquo;Pick up sa shop&rdquo; at checkout and we will set your items aside.</p></details>
+      <details><summary>Accepting pa rin ba kayo ng Home Credit?</summary>
+        <p>In-store, yes. Whether Home Credit appears as an online payment option is one of
+           the decisions for the next round.</p></details>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ABOUT ================= -->
+<section id="about" class="page" hidden>
+  <div class="wrap section-head">
+    <h2>About Kryts Legarda</h2>
+  </div>
+  <div class="wrap">
+    <div class="split">
+      <div>
+        <p>Kryts Legarda has been serving riders along Legarda Street in Sampaloc, Manila
+           as an automotive parts store built on one promise: the lowest price on top boxes,
+           brackets and helmets.</p>
+        <p>With more than 290,000 followers and a 96% recommendation rating from our customers,
+           most of our orders still start as a comment or a PM. This website exists so you can
+           order any time &mdash; prices in plain sight, stock on the page, and delivery nationwide.</p>
+        <p>We are an authorized dealer of SEC Motosupply and we carry AccentWire and BRISK
+           parts. Bracket fitting is free when you buy a top box and have it installed sa shop.</p>
+        <div class="badges">
+          <span>SEC Motosupply dealer</span><span>AccentWire</span><span>BRISK</span>
+          <span>Home Credit accepted in-store</span>
+        </div>
+      </div>
+      <img src="images/shop1.webp" alt="Motorcycle shop storefront along a Philippine street with scooters parked at the curb" data-zoom>
+    </div>
+
+    <div class="gallery">
+      <img src="images/install.webp" alt="Motorcycle fitted with a rear top box and a full-face helmet resting on the seat" data-zoom>
+      <img src="images/trike1.webp" alt="Motorized tricycles and motorcycles on a Philippine street" data-zoom>
+      <img src="images/box-4.webp" alt="Touring motorcycle seen from behind with a hard top box and side panniers fitted" data-zoom>
+      <img src="images/helm-4.webp" alt="Full-face helmet with green and white racing graphics and a mirrored visor" data-zoom>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CONTACT ================= -->
+<section id="contact" class="page" hidden>
+  <div class="wrap section-head">
+    <h2>Contact us</h2>
+    <p>Message us for stock checks, bulk orders and custom bracket fabrication.</p>
+  </div>
+  <div class="wrap">
+    <div class="checkout">
+      <form class="panel" id="contact-form" novalidate>
+        <h3>Send a message</h3>
+        <p>We reply within the day during shop hours.</p>
+        <div class="field-row">
+          <div class="field"><label for="c-name">Your name</label>
+            <input id="c-name" required placeholder="Juan Dela Cruz"></div>
+          <div class="field"><label for="c-phone">Mobile number</label>
+            <input id="c-phone" type="tel" required pattern="(09|\+639)[0-9\s\-]{9,13}" placeholder="0917 123 4567"></div>
+        </div>
+        <div class="field"><label for="c-topic">What is this about?</label>
+          <select id="c-topic" required>
+            <option value="">Choose one</option>
+            <option>Stock check / availability</option>
+            <option>Bracket fitting for my model</option>
+            <option>Bulk or reseller pricing</option>
+            <option>Delivery or order status</option>
+            <option>Other</option>
+          </select></div>
+        <div class="field"><label for="c-msg">Message</label>
+          <textarea id="c-msg" rows="4" required placeholder="Ask about a product, your motorcycle model, or delivery to your area"></textarea></div>
+        <button class="btn btn-primary btn-block" type="submit">Send message</button>
+        <div class="form-success" role="status" hidden></div>
+      </form>
+
+      <aside class="panel">
+        <h3>Visit the shop</h3>
+        <p>Legarda Street, Sampaloc, Manila</p>
+        <ul class="spec">
+          <li><span>Address</span><span class="placeholder" style="text-align:right">Legarda St., Sampaloc, Manila<br>(exact number to be supplied)</span></li>
+          <li><span>Mobile</span><span class="placeholder">to be supplied</span></li>
+          <li><span>Shop hours</span><span class="placeholder">to be supplied</span></li>
+          <li><span>Facebook</span><span>Kryts - Legarda</span></li>
+          <li><span>Followers</span><span>290K</span></li>
+        </ul>
+        <p class="note">The highlighted lines are placeholders. Give us the real address,
+           number and opening hours and we will drop them in.</p>
+      </aside>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="logo" style="margin-bottom:14px">
+          <span class="oval">Kryts</span><span class="sub">Legarda</span>
+        </div>
+        <p style="margin:0;color:var(--grey);font-size:13.5px;max-width:34ch">
+          Pinaka murang TopBox, Bracket at Helmet. Legarda Street, Sampaloc, Manila.</p>
+      </div>
+      <div><h4>Shop</h4><ul>
+        <li><a href="#shop" data-page="shop">Top boxes</a></li>
+        <li><a href="#shop" data-page="shop">Brackets</a></li>
+        <li><a href="#shop" data-page="shop">Helmets</a></li>
+        <li><a href="#shop" data-page="shop">Gear &amp; lights</a></li></ul></div>
+      <div><h4>Help</h4><ul>
+        <li><a href="#how" data-page="how">How to order</a></li>
+        <li><a href="#how" data-page="how">Shipping &amp; COD</a></li>
+        <li><a href="#how" data-page="how">Exchange policy</a></li>
+        <li><a href="#contact" data-page="contact">Contact us</a></li></ul></div>
+      <div><h4>Shop details</h4><ul>
+        <li class="placeholder">Phone: to be supplied</li>
+        <li class="placeholder">Hours: to be supplied</li>
+        <li>Legarda St., Sampaloc, Manila</li>
+        <li>SEC Motosupply dealer</li></ul></div>
+    </div>
+    <div class="foot-bottom">
+      <span>&copy; 2026 Kryts Legarda. Design prototype by SSD GPS Corporation.</span>
+      <span>Sample products, prices and stock &mdash; not a price list.</span>
+    </div>
+  </div>
+</footer>
+
+<!-- product detail -->
+<div class="overlay" id="detail" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="d-name">
+    <button class="sheet-close" data-close="detail" aria-label="Close">&times;</button>
+    <div class="detail">
+      <div class="detail-media"><img id="d-img" src="" alt=""></div>
+      <div class="detail-body">
+        <span class="cat" id="d-cat"></span>
+        <h3 id="d-name"></h3>
+        <p class="fit" id="d-fit"></p>
+        <div class="detail-price" id="d-price"></div>
+        <span class="fit" id="d-stock"></span>
+        <ul class="spec" id="d-spec"></ul>
+        <div class="qty">
+          <button type="button" data-qty="-1" aria-label="Decrease quantity">&minus;</button>
+          <input id="d-qty" type="number" value="1" min="1" max="20" aria-label="Quantity">
+          <button type="button" data-qty="1" aria-label="Increase quantity">+</button>
+        </div>
+        <button class="btn btn-primary btn-block" id="d-add">Add to cart</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- cart -->
+<div class="overlay" id="cart" hidden>
+  <div class="sheet cart-sheet" role="dialog" aria-modal="true" aria-labelledby="cart-title">
+    <button class="sheet-close" data-close="cart" aria-label="Close">&times;</button>
+    <div class="cart-head"><h3 id="cart-title">Your cart</h3></div>
+    <ul id="cart-items"></ul>
+    <div class="cart-foot">
+      <div class="totals">
+        <div><span>Subtotal</span><span id="cart-subtotal">&#8369;0</span></div>
+        <div><span>Shipping (est.)</span><span id="cart-ship">&#8369;0</span></div>
+        <div class="grand"><span>Total</span><span id="cart-total">&#8369;0</span></div>
+      </div>
+      <button class="btn btn-primary btn-block" id="go-checkout" style="margin-top:16px">Proceed to checkout</button>
+      <p class="note">Free shipping on orders over &#8369;2,500 (sample rule).</p>
+    </div>
+  </div>
+</div>
+
+<!-- lightbox -->
+<div class="overlay" id="lightbox" hidden>
+  <button class="sheet-close" data-close="lightbox" aria-label="Close">&times;</button>
+  <img src="" alt="">
+</div>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* =======================================================================
+   SAMPLE CATALOG - written by SSD GPS for layout review.
+   shortcut: prices/stock/fitments are invented placeholders, replace with
+   the client's real price list in round 2 before anyone quotes from this.
+   ======================================================================= */
+const PRODUCTS = [
+  {id:'tb45', cat:'topbox', name:'45L Hard Top Box with Backrest', price:3450, was:3990,
+   img:'images/box-4.webp', alt:'Touring motorcycle rear view with a large hard top box and side panniers',
+   fit:'Universal - needs a rear rack or bracket. Fits a full-face helmet plus a jacket.',
+   stock:12, spec:{Capacity:'45 litres',Material:'ABS hard shell',Lock:'Keyed, 2 keys',Includes:'Backrest pad, base plate'}},
+
+  {id:'tb38', cat:'topbox', name:'38L Touring Top Box - Gloss Black', price:2890, was:3350,
+   img:'images/box-1.webp', alt:'White motorcycle parked in a street with a black top box on the rear rack',
+   fit:'Fits most scooters and underbones with a standard base plate.',
+   stock:20, spec:{Capacity:'38 litres',Material:'ABS hard shell',Lock:'Keyed, 2 keys',Reflector:'Rear red reflector'}},
+
+  {id:'tb52', cat:'topbox', name:'52L Adventure Top Case', price:4790, was:0,
+   img:'images/box-2.webp', alt:'Black adventure motorcycle fitted with a large top case and side pannier',
+   fit:'For big bikes and adventure builds. Two full-face helmets fit inside.',
+   stock:5, spec:{Capacity:'52 litres',Material:'Reinforced ABS',Lock:'Keyed with backrest',Extras:'Red reflector strip'}},
+
+  {id:'tbset', cat:'topbox', name:'3-Piece Luggage Set - Top Box + Side Cases', price:12900, was:14500,
+   img:'images/box-5.webp', alt:'Touring motorcycle from behind with a top box and matching side panniers fitted',
+   fit:'Touring set. Mounting frames sold separately per model.',
+   stock:2, spec:{Pieces:'1 top box + 2 panniers',Capacity:'45L + 2 x 30L',Material:'ABS with chrome trim',Lock:'One key fits all three'}},
+
+  {id:'tb30', cat:'topbox', name:'30L Colour-Matched Top Box', price:2290, was:0,
+   img:'images/box-3.webp', alt:'Blue colour-matched motorcycle top box with a passenger backrest',
+   fit:'Compact daily box for city riding. Paint colour on request.',
+   stock:0, spec:{Capacity:'30 litres',Material:'ABS hard shell',Finish:'Colour-matched lid',Includes:'Backrest pad'}},
+
+  {id:'brck', cat:'bracket', name:'Top Box Bracket - Honda Click / Beat / Vario', price:890, was:1150,
+   img:'images/bike1.webp', alt:'Honda Click scooter in a dealership showroom',
+   fit:'Fits Honda Click 125i / 150i, Beat, Vario 125 / 150. Bolt-on, no drilling.',
+   stock:26, spec:{Material:'2mm powder-coated steel',Finish:'Matte black',Fitting:'Bolt-on, free sa shop',Load:'Up to 10kg'}},
+
+  {id:'brku', cat:'bracket', name:'Universal Rear Rack Bracket', price:1150, was:0,
+   img:'images/install.webp', alt:'Motorcycle with a rear top box mounted on a rack and a helmet on the seat',
+   fit:'Adjustable arms for Nmax, Aerox, Mio, Raider, Sniper and most underbones.',
+   stock:18, spec:{Material:'3mm steel',Finish:'Powder-coated black',Adjustment:'Sliding arms 180-320mm',Load:'Up to 15kg'}},
+
+  {id:'hmff', cat:'helmet', name:'Full-Face Helmet - Gloss White', price:2650, was:2990,
+   img:'images/helm-1.webp', alt:'Glossy white full-face motorcycle helmet with the clear visor raised',
+   fit:'Sizes M, L, XL. Clear visor included, smoked visor add-on available.',
+   stock:14, spec:{Type:'Full face',Shell:'ABS',Visor:'Clear, quick-release',Vents:'Chin and crown intake'}},
+
+  {id:'hmbk', cat:'helmet', name:'Full-Face Helmet - Gloss Black', price:2450, was:0,
+   img:'images/helm-2.webp', alt:'Glossy black full-face motorcycle helmet with the visor flipped up',
+   fit:'Sizes S to XL. The bestseller - plain black, dark visor option.',
+   stock:22, spec:{Type:'Full face',Shell:'ABS',Visor:'Clear with lift tab',Liner:'Removable, washable'}},
+
+  {id:'hmrc', cat:'helmet', name:'Racing Helmet - Green Graphics + Iridium Visor', price:3990, was:4600,
+   img:'images/helm-4.webp', alt:'Full-face helmet with green, white and silver racing graphics and an iridium mirrored visor',
+   fit:'Sizes M, L. Mirrored iridium visor included.',
+   stock:6, spec:{Type:'Full face',Shell:'ABS',Visor:'Iridium mirrored',Vents:'Chin and brow intake'}},
+
+  {id:'hmmx', cat:'helmet', name:'Motocross Helmet - Flame Graphics', price:2990, was:0,
+   img:'images/helm-5.webp', alt:'Black motocross helmet with red and orange flame graphics and a sun peak',
+   fit:'Sizes M, L, XL. Peak visor, goggle-ready eye port.',
+   stock:9, spec:{Type:'Motocross / off-road',Shell:'ABS with peak',Visor:'Clear shield fitted',Use:'Dual-sport and off-road'}},
+
+  {id:'hmtr', cat:'helmet', name:'Touring Helmet - Pearl White', price:3290, was:3650,
+   img:'images/helm-3.webp', alt:'Glossy white full-face helmet with a dark tinted visor resting on a motorcycle seat',
+   fit:'Sizes M, L. Dark tinted visor fitted, clear visor included in the box.',
+   stock:7, spec:{Type:'Full face touring',Shell:'ABS',Visor:'Tinted + clear spare',Padding:'Quilted cheek pads'}},
+
+  {id:'glov', cat:'gear', name:'Armoured Riding Gloves', price:1290, was:1590,
+   img:'images/glove-1.webp', alt:'Black leather motorcycle riding glove with hard knuckle armour',
+   fit:'Sizes M, L, XL. Hard knuckle and finger armour, touchscreen fingertips.',
+   stock:30, spec:{Material:'Leather with mesh panels',Protection:'Hard knuckle + finger plates',Closure:'Wrist strap',Sizes:'M / L / XL'}},
+
+  {id:'led1', cat:'gear', name:'LED Spotlight Kit with Yellow Filters', price:1450, was:0,
+   img:'images/led-1.webp', alt:'Assorted black LED spotlight heads with amber lens filters and handlebar clamps',
+   fit:'Universal. Comes with handlebar clamps and amber fog filters.',
+   stock:16, spec:{Lights:'2 x LED spot heads',Filters:'Amber fog lens included',Mounting:'Handlebar / crash bar clamps',Wiring:'Harness and switch'}}
+];
+const CATS = {topbox:'Top box', bracket:'Bracket', helmet:'Helmet', gear:'Gear & lights'};
+const SHIP_FLAT = 180, FREE_SHIP_OVER = 2500;
+const peso = n => '\u20B1' + n.toLocaleString('en-PH');
+
+/* ---------- page switching ---------- */
+function show(page){
+  document.querySelectorAll('.page').forEach(s => s.hidden = s.id !== page);
+  document.querySelectorAll('nav [data-page]').forEach(a =>
+    a.classList.toggle('active', a.dataset.page === page));
+  document.body.classList.remove('nav-open');
+  window.scrollTo(0,0);
+}
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-page]');
+  if(!t) return;
+  e.preventDefault();
+  closeAll();
+  show(t.dataset.page);
+});
+document.querySelectorAll('[data-scroll]').forEach(a =>
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    document.getElementById(a.dataset.scroll)
+      .scrollIntoView({behavior:'smooth', block:'start'});
+  }));
+
+/* ---------- mobile menu ---------- */
+const burger = document.getElementById('burger');
+burger.addEventListener('click', () => {
+  const open = document.body.classList.toggle('nav-open');
+  burger.setAttribute('aria-expanded', open);
+});
+
+/* ---------- render the grid ---------- */
+const grid = document.getElementById('product-grid');
+grid.innerHTML = PRODUCTS.map(p => `
+  <article class="card" data-tags="${p.cat} ${p.name} ${p.fit} ${Object.values(p.spec).join(' ')} ${p.name.replace(/-/g,' ')}" data-id="${p.id}">
+    <div class="card-media" data-open="${p.id}">
+      <img src="${p.img}" alt="${p.alt}" loading="lazy">
+      ${p.stock === 0 ? '<span class="tag out">Out of stock</span>'
+        : p.was ? '<span class="tag">Sale</span>' : ''}
+    </div>
+    <div class="card-body">
+      <span class="cat">${CATS[p.cat]}</span>
+      <h3>${p.name}</h3>
+      <p class="fit">${p.fit}</p>
+      <div class="price-row">
+        <span class="price">${peso(p.price)}</span>
+        ${p.was ? `<span class="was">${peso(p.was)}</span>` : ''}
+      </div>
+      <div class="card-actions">
+        <button class="view-link" data-open="${p.id}">View &rarr;</button>
+        <button class="btn btn-dark" data-add="${p.id}" ${p.stock === 0 ? 'disabled' : ''}>
+          ${p.stock === 0 ? 'Sold out' : 'Add to cart'}</button>
+      </div>
+    </div>
+  </article>`).join('');
+
+/* ---------- filter + search ---------- */
+const cards = [...grid.querySelectorAll('.card')];
+const q = document.getElementById('search');
+const count = document.getElementById('result-count');
+function apply(){
+  const term = q.value.trim().toLowerCase();
+  const tag = document.querySelector('.chip.active').dataset.filter;
+  cards.forEach(el => {
+    const matchTag  = tag === 'all' || el.dataset.tags.split(' ')[0] === tag;
+    const matchTerm = !term || el.dataset.tags.toLowerCase().includes(term);
+    el.hidden = !(matchTag && matchTerm);
+  });
+  const shown = cards.filter(el => !el.hidden).length;
+  count.textContent = shown ? `${shown} item${shown > 1 ? 's' : ''}` : '';
+  let empty = grid.querySelector('.empty');
+  if(!shown){
+    if(!empty){
+      empty = document.createElement('div');
+      empty.className = 'empty';
+      grid.appendChild(empty);
+    }
+    empty.innerHTML = `<strong>No results found</strong>
+      Wala kaming nakita para sa &ldquo;${q.value.replace(/[<>&]/g,'')}&rdquo;.
+      Try &ldquo;top box&rdquo;, &ldquo;Click&rdquo; or &ldquo;full face&rdquo;, or message us for a stock check.`;
+    empty.hidden = false;
+  } else if(empty){ empty.hidden = true; }
+}
+q.addEventListener('input', apply);
+document.querySelectorAll('.chip').forEach(b =>
+  b.addEventListener('click', () => {
+    document.querySelectorAll('.chip').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    apply();
+  }));
+apply();
+
+/* ---------- cart (in memory only) ---------- */
+const cart = [];
+const find = id => PRODUCTS.find(p => p.id === id);
+const subtotal = () => cart.reduce((s,i) => s + find(i.id).price * i.qty, 0);
+const shipping = () => (cart.length === 0 || subtotal() >= FREE_SHIP_OVER) ? 0 : SHIP_FLAT;
+
+function render(){
+  const n = cart.reduce((s,i) => s + i.qty, 0);
+  const badge = document.getElementById('cart-count');
+  badge.textContent = n;
+  badge.hidden = n === 0;
+
+  const list = document.getElementById('cart-items');
+  list.innerHTML = cart.length ? cart.map((i,idx) => {
+    const p = find(i.id);
+    return `<li>
+      <img src="${p.img}" alt="${p.alt}">
+      <div class="ci-main"><strong>${p.name}</strong>
+        <small>${CATS[p.cat]} &middot; ${peso(p.price)} x ${i.qty}</small></div>
+      <span class="ci-price">${peso(p.price * i.qty)}</span>
+      <button class="ci-remove" data-remove="${idx}" aria-label="Remove ${p.name}">&times;</button>
+    </li>`;}).join('')
+    : '<li class="empty-row">Wala pa sa cart. Browse the shop and add an item.</li>';
+
+  const sub = subtotal(), ship = shipping();
+  document.getElementById('cart-subtotal').textContent = peso(sub);
+  document.getElementById('cart-ship').textContent = ship ? peso(ship) : 'FREE';
+  document.getElementById('cart-total').textContent = peso(sub + ship);
+  document.getElementById('go-checkout').disabled = cart.length === 0;
+
+  document.getElementById('sum-count').textContent = n;
+  document.getElementById('sum-items').innerHTML = cart.map(i => {
+    const p = find(i.id);
+    return `<li><span>${p.name} &times;${i.qty}</span><span>${peso(p.price * i.qty)}</span></li>`;
+  }).join('') || '<li><span>No items yet</span><span>&mdash;</span></li>';
+  document.getElementById('sum-subtotal').textContent = peso(sub);
+  document.getElementById('sum-ship').textContent = ship ? peso(ship) : 'FREE';
+  document.getElementById('sum-total').textContent = peso(sub + ship);
+  document.querySelector('#order-form button[type=submit]').disabled = cart.length === 0;
+}
+
+let toastTimer;
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+}
+function add(id, qty = 1){
+  const p = find(id);
+  if(!p || p.stock === 0) return;
+  const line = cart.find(i => i.id === id);
+  if(line) line.qty = Math.min(line.qty + qty, 20); else cart.push({id, qty});
+  render();
+  toast(`${p.name} added to cart`);
+}
+document.addEventListener('click', e => {
+  const a = e.target.closest('[data-add]');
+  if(a && !a.disabled){ add(a.dataset.add); return; }
+  const r = e.target.closest('[data-remove]');
+  if(r){ cart.splice(+r.dataset.remove, 1); render(); }
+});
+
+/* ---------- overlays ---------- */
+function openOv(id){ document.getElementById(id).hidden = false; }
+function closeAll(){ ['detail','cart','lightbox'].forEach(id => document.getElementById(id).hidden = true); }
+document.querySelectorAll('[data-close]').forEach(b =>
+  b.addEventListener('click', () => document.getElementById(b.dataset.close).hidden = true));
+document.querySelectorAll('.overlay').forEach(ov =>
+  ov.addEventListener('click', e => { if(e.target === ov) ov.hidden = true; }));
+document.addEventListener('keydown', e => { if(e.key === 'Escape') closeAll(); });
+
+document.getElementById('open-cart').addEventListener('click', () => openOv('cart'));
+document.getElementById('go-checkout').addEventListener('click', () => {
+  closeAll(); show('checkout');
+});
+
+/* ---------- product detail ---------- */
+let current = null;
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-open]');
+  if(!t) return;
+  const p = find(t.dataset.open);
+  current = p;
+  document.getElementById('d-img').src = p.img;
+  document.getElementById('d-img').alt = p.alt;
+  document.getElementById('d-cat').textContent = CATS[p.cat];
+  document.getElementById('d-name').textContent = p.name;
+  document.getElementById('d-fit').textContent = p.fit;
+  document.getElementById('d-price').innerHTML =
+    peso(p.price) + (p.was ? ` <span class="was" style="font-size:16px">${peso(p.was)}</span>` : '');
+  document.getElementById('d-stock').textContent =
+    p.stock === 0 ? 'Out of stock - message us for restock date'
+                  : `${p.stock} in stock sa Legarda branch`;
+  document.getElementById('d-spec').innerHTML = Object.entries(p.spec)
+    .map(([k,v]) => `<li><span>${k}</span><span>${v}</span></li>`).join('');
+  document.getElementById('d-qty').value = 1;
+  const btn = document.getElementById('d-add');
+  btn.disabled = p.stock === 0;
+  btn.textContent = p.stock === 0 ? 'Sold out' : 'Add to cart';
+  openOv('detail');
+});
+document.querySelectorAll('[data-qty]').forEach(b =>
+  b.addEventListener('click', () => {
+    const input = document.getElementById('d-qty');
+    input.value = Math.min(20, Math.max(1, (+input.value || 1) + (+b.dataset.qty)));
+  }));
+document.getElementById('d-add').addEventListener('click', () => {
+  if(!current) return;
+  add(current.id, Math.max(1, +document.getElementById('d-qty').value || 1));
+  closeAll();
+});
+
+/* ---------- lightbox ---------- */
+const lb = document.getElementById('lightbox');
+document.querySelectorAll('[data-zoom]').forEach(img =>
+  img.addEventListener('click', () => {
+    lb.querySelector('img').src = img.src;
+    lb.querySelector('img').alt = img.alt;
+    openOv('lightbox');
+  }));
+
+/* ---------- fake order submit ---------- */
+document.getElementById('order-form').addEventListener('submit', e => {
+  e.preventDefault();
+  const form = e.target;
+  if(!form.reportValidity()) return;
+  if(cart.length === 0){ toast('Your cart is empty'); return; }
+  const ref = 'KL-' + new Date().getFullYear() + '-' +
+    String(Math.floor(Math.random() * 9000) + 1000);
+  const total = peso(subtotal() + shipping());
+  const pay = form.querySelector('input[name=payment]:checked').value;
+  const payLabel = {cod:'Cash on Delivery', gcash:'GCash', pickup:'Pay sa shop'}[pay];
+  const ok = form.querySelector('.form-success');
+  ok.innerHTML = `<h4>Salamat, order received</h4>
+    <p style="margin:0 0 10px">Your reference number is <code>${ref}</code>.
+       Total <strong>${total}</strong> via <strong>${payLabel}</strong>.</p>
+    <p style="margin:0;font-size:13.5px">We will text you within the day to confirm before shipping.</p>
+    <p style="margin:10px 0 0;font-size:12.5px;color:#4a6b4f">
+       <strong>Prototype:</strong> nothing was actually ordered, charged or saved.</p>`;
+  ok.hidden = false;
+  form.querySelectorAll('input,textarea,select,button').forEach(el => el.disabled = true);
+  ok.scrollIntoView({behavior:'smooth', block:'center'});
+});
+
+/* ---------- fake contact submit ---------- */
+document.getElementById('contact-form').addEventListener('submit', e => {
+  e.preventDefault();
+  const form = e.target;
+  if(!form.reportValidity()) return;
+  const ok = form.querySelector('.form-success');
+  ok.innerHTML = `<h4>Message sent</h4>
+    <p style="margin:0">Salamat! We reply within the day during shop hours.</p>
+    <p style="margin:10px 0 0;font-size:12.5px;color:#4a6b4f">
+       <strong>Prototype:</strong> no message was actually sent.</p>`;
+  ok.hidden = false;
+  form.querySelectorAll('input,textarea,select,button').forEach(el => el.disabled = true);
+});
+
+/* ---------- boot ---------- */
+render();
+const start = location.hash.slice(1);
+show(document.getElementById(start) && document.getElementById(start).classList.contains('page') ? start : 'shop');
+</script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+Vertex Builders & Development Corp - demo brief
+(SAMPLE brief, written by agent to prove the workflow)
+
+1. Reference site: bmw.com - client said they like "dark, strong, industrial,
+   big photos of the work". Judged on feel more than layout.
+2. Pages (4): Home, Projects, Services, Contact
+3. Brand: none supplied. AGENT CALL - BMW design system palette: BMW Blue
+   #1c69d4 accent, near-black #262626 text, zero border-radius, system font
+   stack (BMWTypeNextLatin unavailable, no webfont allowed offline).
+4. Must prove: the Projects page - filterable grid of completed works.
+   That is what the client is really judging.
+5. Business: Vertex Builders & Development Corp, Quezon City. General
+   contracting, design-build, structural retrofit, project management.
+   (02) 8712-4400 / projects@vertexbuilders.ph
+6. Deadline: sample, none.

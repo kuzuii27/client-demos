@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<!-- PROTOTYPE for SSD GPS Philippines - throwaway demo, not production code. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SSD GPS Philippines - Your GPS Partner</title>
+<style>
+:root{
+  --bg:#05072F; --panel:#080B48; --surface:#0E1152; --raised:#161A5C; --slate:#3C3F6D;
+  --line:rgba(255,255,255,.08); --line-subtle:rgba(255,255,255,.05);
+  --t1:#F7F8F8; --t2:#D0D6E0; --t3:#A3A8CC;
+  --gold:#C9A227; --cream:#FADDA7; --cream-2:#FCE9C5;
+  --ok:#3CCF63; --alert:#FF6B6B;
+  --nav-h:64px;
+  --sans:-apple-system,system-ui,"Segoe UI Variable Text","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,"SF Mono","Cascadia Mono",Consolas,Menlo,monospace;
+  --r-sm:4px; --r:6px; --r-card:8px; --r-panel:12px; --r-lg:22px;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{background:var(--bg);color-scheme:dark;scrollbar-color:var(--slate) var(--bg)}
+body{margin:0;font:400 16px/1.5 var(--sans);color:var(--t2);background:var(--bg);-webkit-font-smoothing:antialiased;caret-color:var(--gold)}
+::selection{background:var(--gold);color:var(--panel)}
+::-webkit-scrollbar{width:10px;height:8px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--slate);border-radius:9999px}
+img{max-width:100%;display:block}
+h1,h2,h3{color:var(--t1);margin:0;text-wrap:balance;font-weight:510}
+p{margin:0}
+a{color:var(--cream);text-underline-offset:3px}
+:focus-visible{outline:2px solid var(--cream);outline-offset:3px;border-radius:var(--r)}
+.wrap{max-width:1200px;margin:0 auto;padding:0 20px}
+.num{font-variant-numeric:tabular-nums}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 20px;border-radius:var(--r);font:510 15px/1 var(--sans);text-decoration:none;cursor:pointer;border:1px solid transparent;transition:background .2s,border-color .2s,color .2s,transform .2s cubic-bezier(.16,1,.3,1)}
+.btn:active{transform:translateY(1px)}
+.btn-gold{background:var(--gold);color:var(--panel)}
+.btn-gold:hover{background:var(--cream)}
+.btn-ghost{background:rgba(255,255,255,.02);color:var(--t1);border-color:var(--line)}
+.btn-ghost:hover{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.16)}
+.btn svg{width:18px;height:18px;flex:none}
+
+/* header */
+header{position:sticky;top:0;z-index:30;height:var(--nav-h);background:rgba(5,7,47,.86);backdrop-filter:saturate(1.4) blur(12px);border-bottom:1px solid var(--line-subtle)}
+header .wrap{height:100%;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.brand{display:inline-flex;align-items:center;min-height:44px}
+.brand img{height:34px;width:auto}
+#burger{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.03);border:1px solid var(--line);color:var(--t1);cursor:pointer}
+#burger svg{width:20px;height:20px}
+.nav{display:none;position:absolute;top:var(--nav-h);left:0;right:0;flex-direction:column;gap:4px;padding:12px 20px 20px;background:var(--panel);border-bottom:1px solid var(--line)}
+.nav-open .nav{display:flex}
+.nav a{display:flex;align-items:center;min-height:44px;padding:0 12px;border-radius:var(--r);color:var(--t2);text-decoration:none;font:510 15px/1 var(--sans)}
+.nav a:hover,.nav a.active{color:var(--t1);background:rgba(255,255,255,.04)}
+.nav a.btn-gold,.nav a.btn-gold.active{color:var(--panel);background:var(--gold);justify-content:center}
+.nav a.btn-gold:hover{background:var(--cream)}
+
+/* hero */
+.hero{min-height:min(600px,calc(100vh - var(--nav-h)));padding:28px 0 48px;background:radial-gradient(80% 60% at 75% 10%,rgba(60,63,109,.45),transparent 70%)}
+.hero .wrap{display:grid;gap:28px;align-items:center}
+.hero h1{font-size:40px;line-height:1.02;letter-spacing:-1.2px}
+.hero h1 span{display:block;color:var(--cream)}
+.lede{margin-top:16px;font-size:17px;line-height:1.6;color:var(--t2);max-width:34em}
+.cta-row{display:flex;flex-wrap:wrap;gap:12px;margin-top:22px}
+.trust{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:20px;font:510 13px/1.4 var(--sans);color:var(--t3)}
+.trust span{display:inline-flex;align-items:center;gap:6px}
+.trust svg{width:16px;height:16px;color:var(--gold)}
+
+/* live panel */
+.live{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-panel);box-shadow:0 24px 48px -12px rgba(0,0,0,.55),0 2px 4px rgba(0,0,0,.4);overflow:hidden}
+.live-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px;border-bottom:1px solid var(--line-subtle);font:510 13px/1.3 var(--sans);color:var(--t1)}
+.live-head .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ok);margin-right:8px;box-shadow:0 0 0 0 rgba(60,207,99,.6);animation:ping 2s cubic-bezier(.16,1,.3,1) infinite}
+@keyframes ping{to{box-shadow:0 0 0 8px rgba(60,207,99,0)}}
+.badge{display:inline-flex;align-items:center;padding:3px 8px;border-radius:var(--r-sm);background:rgba(250,221,167,.1);border:1px solid rgba(250,221,167,.25);color:var(--cream);font:510 11px/1.4 var(--sans);white-space:nowrap}
+.live-body{display:grid}
+.map-box{position:relative;background:#060935}
+#map{display:block;width:100%;height:auto}
+.road{fill:none;stroke:rgba(255,255,255,.13);stroke-width:2.5;stroke-linecap:round}
+.road.major{stroke:rgba(163,168,204,.32);stroke-width:4}
+.district{fill:var(--t3);font:510 12px var(--sans);letter-spacing:.4px}
+.veh .halo{fill:none;stroke:var(--cream);stroke-width:2;opacity:0;transition:opacity .2s}
+.veh .tag{opacity:0;transition:opacity .2s}
+.veh.sel .halo,.veh.sel .tag{opacity:1}
+.veh .pulse{transform-box:fill-box;transform-origin:center;animation:vp 1.8s ease-out infinite}
+@keyframes vp{from{transform:scale(1);opacity:.55}to{transform:scale(2.6);opacity:0}}
+.toast{position:absolute;top:10px;right:10px;left:10px;max-width:300px;margin-left:auto;display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:var(--r-card);background:var(--raised);border:1px solid rgba(255,107,107,.45);box-shadow:0 8px 20px rgba(0,0,0,.45);font-size:13px;line-height:1.4;color:var(--t1);transition:opacity .35s,transform .35s cubic-bezier(.16,1,.3,1)}
+.toast.off{opacity:0;transform:translateY(-8px);pointer-events:none}
+.toast svg{width:18px;height:18px;flex:none;color:var(--alert);margin-top:1px}
+.toast small{display:block;color:var(--t3);font-size:11px}
+.vlist{display:flex;gap:8px;padding:10px;overflow-x:auto;scroll-snap-type:x mandatory;border-top:1px solid var(--line-subtle)}
+.vcard{flex:0 0 156px;scroll-snap-align:start;display:grid;grid-template-columns:1fr auto;gap:2px 8px;align-items:center;text-align:left;padding:10px 12px;min-height:72px;border-radius:var(--r-card);background:rgba(255,255,255,.02);border:1px solid var(--line);color:var(--t2);font:400 12px/1.4 var(--sans);cursor:pointer;transition:background .2s,border-color .2s}
+.vcard:hover{background:rgba(255,255,255,.05)}
+.vcard[aria-pressed="true"]{border-color:var(--cream);background:rgba(250,221,167,.06)}
+.plate{font:510 13px/1.3 var(--mono);color:var(--t1);letter-spacing:.3px}
+.st{font:510 11px/1 var(--sans);display:inline-flex;align-items:center;gap:5px}
+.st::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.st-Moving{color:var(--ok)}.st-Idle{color:var(--t3)}.st-Stopped{color:var(--alert)}
+.vcard .meta{grid-column:1/-1;color:var(--t3);font-variant-numeric:tabular-nums}
+.live-foot{display:flex;justify-content:space-between;gap:12px;padding:8px 14px;border-top:1px solid var(--line-subtle);font-size:12px;color:var(--t3)}
+
+/* sections */
+section.band{padding:56px 0}
+.h-sec{font-size:32px;line-height:1.13;letter-spacing:-.7px}
+.sub{margin-top:12px;font-size:17px;line-height:1.6;color:var(--t3);max-width:40em}
+.stats{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--line);border-radius:var(--r-panel);background:rgba(255,255,255,.02)}
+.stat{padding:22px 20px;border-color:var(--line-subtle);border-style:solid;border-width:0}
+.stat:nth-child(odd){border-right-width:1px}.stat:nth-child(-n+2){border-bottom-width:1px}
+.stat b{display:block;font:510 36px/1 var(--sans);letter-spacing:-1px;color:var(--t1);font-variant-numeric:tabular-nums}
+.stat span{display:block;margin-top:8px;font-size:14px;color:var(--t3)}
+
+/* tabs */
+.tabs{display:flex;gap:6px;margin-top:28px;overflow-x:auto;padding-bottom:4px}
+.tab{flex:none;min-height:44px;padding:0 16px;border-radius:9999px;background:transparent;border:1px solid var(--line);color:var(--t2);font:510 14px/1 var(--sans);cursor:pointer;transition:background .2s,border-color .2s,color .2s}
+.tab:hover{background:rgba(255,255,255,.04);color:var(--t1)}
+.tab[aria-selected="true"]{background:var(--gold);border-color:var(--gold);color:var(--panel)}
+.tabpanel{margin-top:20px;display:grid;gap:24px;align-items:center;padding:20px;border:1px solid var(--line);border-radius:var(--r-panel);background:rgba(255,255,255,.02)}
+.tabpanel h3{font-size:24px;line-height:1.3;letter-spacing:-.3px}
+.tabpanel p{margin-top:10px;line-height:1.6;color:var(--t2);max-width:36em}
+.ticks{list-style:none;padding:0;margin:16px 0 0;display:grid;gap:8px}
+.ticks li{display:flex;gap:10px;align-items:flex-start;line-height:1.5}
+.ticks svg{width:18px;height:18px;flex:none;margin-top:3px;color:var(--gold)}
+.media{position:relative;border-radius:var(--r-panel);overflow:hidden;border:1px solid var(--line);background:var(--panel)}
+.media img{width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;cursor:zoom-in}
+.media svg.mock{display:block;width:100%;height:auto}
+.chart{position:absolute;left:12px;bottom:12px;width:min(260px,70%);background:rgba(8,11,72,.92);border:1px solid var(--line);border-radius:var(--r-card);padding:8px 10px 6px;box-shadow:0 8px 20px rgba(0,0,0,.45)}
+.chart svg{display:block;width:100%;height:auto}
+.link-more{display:inline-flex;align-items:center;gap:6px;min-height:44px;margin-top:14px;font:510 15px/1 var(--sans);text-decoration:none;color:var(--cream)}
+.link-more:hover{text-decoration:underline}
+
+/* photo band */
+.photo{position:relative;min-height:420px;display:flex;align-items:flex-end;overflow:hidden}
+.photo>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:60% 50%}
+.photo::before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(0deg,rgba(5,7,47,.97) 0%,rgba(5,7,47,.92) 50%,rgba(5,7,47,.15) 90%)}
+.photo .wrap{position:relative;z-index:2;width:100%;padding-bottom:40px;padding-top:160px}
+.photo h2{font-size:32px;line-height:1.13;letter-spacing:-.7px;max-width:16em}
+.photo .credit{position:absolute;right:12px;top:10px;z-index:1;font-size:11px;color:rgba(247,248,248,.85);background:rgba(5,7,47,.6);padding:2px 6px;border-radius:var(--r-sm)}
+
+/* perks */
+.perks{list-style:none;padding:0;margin:24px 0 0;display:grid;border-top:1px solid var(--line)}
+.perks li{display:grid;grid-template-columns:40px 1fr;gap:4px 14px;padding:16px 0;border-bottom:1px solid var(--line)}
+.perks svg{width:24px;height:24px;color:var(--gold);grid-row:span 2;margin-top:2px}
+.perks b{color:var(--t1);font-weight:590}
+.perks span{color:var(--t3);font-size:15px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
+.chip{display:inline-flex;align-items:center;min-height:36px;padding:0 14px;border-radius:9999px;border:1px solid var(--slate);color:var(--t2);font:510 13px/1 var(--sans)}
+.cred{display:grid;gap:20px;align-items:center;padding:28px;border-radius:var(--r-panel);border:1px solid var(--line);background:linear-gradient(135deg,rgba(60,63,109,.35),rgba(255,255,255,.02))}
+.seal{display:flex;gap:16px;align-items:center}
+.seal svg{width:56px;height:56px;flex:none;color:var(--gold)}
+.seal b{display:block;color:var(--t1);font:510 20px/1.3 var(--sans)}
+.seal span{color:var(--t3);font-size:14px}
+
+/* solutions page */
+.page-head{position:relative;overflow:hidden;padding:72px 0 40px}
+.page-head>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:70% 40%}
+.page-head::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(5,7,47,.98) 0%,rgba(5,7,47,.9) 50%,rgba(5,7,47,.35) 100%);z-index:1}
+.page-head .wrap{position:relative;z-index:2}
+.page-head h1{font-size:40px;line-height:1.05;letter-spacing:-1.2px;max-width:12em}
+.sol{display:grid;gap:24px;align-items:center;padding:40px 0;border-bottom:1px solid var(--line-subtle)}
+.sol:last-child{border-bottom:0}
+.sol h2{font-size:28px;line-height:1.15;letter-spacing:-.5px}
+.sol p{margin-top:10px;line-height:1.6;max-width:38em}
+.icon-tile{display:grid;place-items:center;aspect-ratio:16/9;border-radius:var(--r-panel);border:1px solid var(--line);background:radial-gradient(60% 80% at 50% 40%,rgba(60,63,109,.5),var(--panel))}
+.icon-tile svg{width:96px;height:96px;color:var(--cream)}
+
+/* demo form */
+.demo{display:grid;gap:28px;padding-block:40px 64px}
+form{display:grid;gap:18px;padding:22px;border:1px solid var(--line);border-radius:var(--r-panel);background:rgba(255,255,255,.02)}
+.row2{display:grid;gap:18px}
+.field{display:grid;gap:6px}
+label,.legend{font:510 14px/1.4 var(--sans);color:var(--t1)}
+.opt{color:var(--t3);font-weight:400}
+input,select,textarea{width:100%;min-height:48px;padding:12px 14px;border-radius:var(--r);border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.03);color:var(--t1);font:400 16px/1.4 var(--sans);transition:border-color .2s,background .2s}
+input::placeholder,textarea::placeholder{color:#8F94BC}
+input:hover,select:hover,textarea:hover{border-color:rgba(255,255,255,.24)}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--cream);background:rgba(255,255,255,.05);box-shadow:0 0 0 3px rgba(250,221,167,.18)}
+select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%23D0D6E0' stroke-width='1.6'%3E%3Cpath d='M5 8l5 5 5-5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;background-size:18px;padding-right:40px}
+select option{background:var(--panel);color:var(--t1)}
+textarea{min-height:110px;resize:vertical}
+[aria-invalid="true"]{border-color:var(--alert)!important}
+.err{display:flex;gap:6px;align-items:center;color:#FF8A8A;font-size:13px}
+.err svg{width:14px;height:14px;flex:none}
+fieldset{border:0;padding:0;margin:0;display:grid;gap:10px}
+.checks{display:flex;flex-wrap:wrap;gap:8px}
+.chk{position:relative;display:inline-flex;align-items:center;gap:10px;min-height:44px;padding:0 14px 0 12px;border-radius:9999px;border:1px solid var(--line);background:rgba(255,255,255,.02);font:400 14px/1.2 var(--sans);color:var(--t2);cursor:pointer;transition:border-color .2s,background .2s}
+.chk input{position:absolute;inset:0;width:100%;height:100%;min-height:0;margin:0;opacity:0;cursor:pointer}
+.chk .box{width:18px;height:18px;border-radius:var(--r-sm);border:1.5px solid var(--t3);display:grid;place-items:center}
+.chk .box svg{width:12px;height:12px;opacity:0;color:var(--panel)}
+.chk:hover{background:rgba(255,255,255,.05)}
+.chk:has(input:checked){border-color:var(--cream);color:var(--t1)}
+.chk:has(input:checked) .box{background:var(--gold);border-color:var(--gold)}
+.chk:has(input:checked) .box svg{opacity:1}
+.chk:has(input:focus-visible){outline:2px solid var(--cream);outline-offset:3px}
+.note{font-size:13px;color:var(--t3)}
+.success{padding:28px;border:1px solid rgba(250,221,167,.35);border-radius:var(--r-panel);background:rgba(250,221,167,.05)}
+.success svg{width:40px;height:40px;color:var(--gold)}
+.success h2{margin-top:12px;font-size:28px;letter-spacing:-.5px}
+.success p{margin-top:10px;line-height:1.6}
+.ref{display:inline-flex;gap:10px;align-items:center;margin-top:14px;padding:10px 14px;border-radius:var(--r);background:var(--panel);border:1px solid var(--line);font:510 15px var(--mono);color:var(--t1)}
+.aside{display:grid;gap:16px;align-content:start}
+.contact-list{list-style:none;padding:0;margin:0;display:grid;gap:4px}
+.contact-list a,.contact-list span.addr{display:flex;gap:12px;align-items:center;min-height:44px;color:var(--t2);text-decoration:none}
+.contact-list a:hover{color:var(--t1)}
+.contact-list svg{width:20px;height:20px;flex:none;color:var(--gold)}
+
+/* footer */
+footer{border-top:1px solid var(--line);background:var(--panel);padding:40px 0 28px;font-size:14px}
+.foot{display:grid;gap:28px}
+.foot h3{font:510 13px/1 var(--sans);color:var(--t3);margin-bottom:10px}
+.foot nav{display:grid}
+.foot nav a{display:flex;align-items:center;min-height:44px;color:var(--t2);text-decoration:none}
+.foot nav a:hover{color:var(--t1)}
+.fine{margin-top:28px;padding-top:18px;border-top:1px solid var(--line-subtle);color:var(--t3);font-size:12px;line-height:1.6}
+
+/* lightbox */
+#lightbox{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:20px;background:rgba(0,0,0,.85)}
+#lightbox img{max-height:84vh;border-radius:var(--r-panel)}
+#lightbox button{position:absolute;top:14px;right:14px;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--t1);cursor:pointer}
+
+@media (min-width:769px){
+  #burger{display:none}
+  .nav{display:flex;position:static;flex-direction:row;align-items:center;padding:0;background:none;border:0}
+  .nav a{font-size:14px}
+  .nav a.btn-gold{margin-left:8px;padding:0 16px}
+  .wrap{padding:0 32px}
+  .hero{display:flex;align-items:center;min-height:0;padding:56px 0 72px}
+  .hero .wrap{width:100%;grid-template-columns:minmax(0,.9fr) minmax(0,1.25fr);gap:48px}
+  .hero h1{font-size:60px;letter-spacing:-1.5px}
+  .live-body{grid-template-columns:minmax(0,1fr) 196px}
+  .vlist{flex-direction:column;overflow:auto;max-height:340px;border-top:0;border-left:1px solid var(--line-subtle);scroll-snap-type:none}
+  .vcard{flex:none}
+  section.band{padding:88px 0}
+  .h-sec{font-size:48px;line-height:1.05;letter-spacing:-1.05px}
+  .stats{grid-template-columns:repeat(4,1fr)}
+  .stat{padding:28px 24px;border-width:0 1px 0 0!important}.stat:last-child{border-right-width:0!important}
+  .stat b{font-size:48px;letter-spacing:-1.05px}
+  .tabpanel{grid-template-columns:1fr 1fr;padding:32px;gap:40px}
+  .photo{min-height:480px}
+  .photo h2{font-size:48px;letter-spacing:-1.05px;max-width:11em}
+  .photo::before{background:linear-gradient(90deg,rgba(5,7,47,.97) 0%,rgba(5,7,47,.9) 42%,rgba(5,7,47,.15) 78%)}
+  .photo .wrap{padding-top:120px}
+  .photo>img{object-position:50% 45%}
+  .perks-wrap{display:grid;grid-template-columns:1fr 1.2fr;gap:64px;align-items:start}
+  .perks{margin-top:0}
+  .cred{grid-template-columns:1fr auto;padding:36px 40px}
+  .page-head{padding:112px 0 72px}
+  .page-head h1{font-size:64px;letter-spacing:-1.4px}
+  .sol{grid-template-columns:1fr 1fr;gap:56px;padding:64px 0}
+  .sol:nth-child(even) .sol-media{order:-1}
+  .demo{grid-template-columns:1.5fr 1fr;gap:48px;padding-block:64px 96px}
+  form{padding:32px}
+  .row2{grid-template-columns:1fr 1fr}
+  .foot{grid-template-columns:1.4fr 1fr 1.4fr}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+}
+[hidden]{display:none !important}
+.page{scroll-margin-top:var(--nav-h)}
+@media (max-width:767px){.toast{top:auto;bottom:10px}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-check" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10.5l4 4 8-9"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3l8 14H2z"/><path d="M10 8v4M10 14.5v.01"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h3l2 5-2.5 1.5a11 11 0 0 0 7 7L16 14l5 2v3a2 2 0 0 1-2 2A16 16 0 0 1 3 5a2 2 0 0 1 2-2z"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10h12M11 5l5 5-5 5"/></symbol>
+  <symbol id="i-wrench" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0 5 5L21 13l-8 8-2-2 6.2-6.2a4 4 0 0 1-5-5L9 5 7 3l3-1z"/><path d="M3 21l6-6"/></symbol>
+  <symbol id="i-infinity" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 8.5c-2 0-3.5 1.6-3.5 3.5s1.5 3.5 3.5 3.5C10 15.5 14 8.5 17.5 8.5c2 0 3.5 1.6 3.5 3.5s-1.5 3.5-3.5 3.5C14 15.5 10 8.5 6.5 8.5z"/></symbol>
+  <symbol id="i-swap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h14l-4-4M20 16H6l4 4"/></symbol>
+  <symbol id="i-steth" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><rect x="3" y="4" width="18" height="16" rx="3"/></symbol>
+  <symbol id="i-cap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c2 2 10 2 12 0v-5"/></symbol>
+  <symbol id="i-ai" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="12" width="28" height="24" rx="4"/><path d="M34 20l8-5v18l-8-5"/><circle cx="20" cy="24" r="5"/><path d="M12 8h4M20 8h4"/></symbol>
+  <symbol id="i-flow" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="14" height="10" rx="2"/><rect x="28" y="20" width="14" height="10" rx="2"/><rect x="6" y="32" width="14" height="10" rx="2"/><path d="M13 16v4h22M13 32v-4h22"/></symbol>
+</svg>
+
+<header>
+  <div class="wrap">
+    <a class="brand" href="#home" data-page="home" aria-label="SSD GPS Philippines home"><img src="images/logo.webp" alt="SSD GPS Philippines logo" width="120" height="34"></a>
+    <button id="burger" aria-label="Open menu" aria-expanded="false" aria-controls="nav"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M3 6h14M3 10h14M3 14h14"/></svg></button>
+    <nav class="nav" id="nav" aria-label="Main">
+      <a href="#home" data-page="home">Home</a>
+      <a href="#solutions" data-page="solutions">Solutions</a>
+      <a href="#demo" data-page="demo" class="btn-gold">Book a Demo</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+<!-- ============ HOME ============ -->
+<section id="home" class="page">
+  <div class="hero">
+    <div class="wrap">
+      <div>
+        <h1>See better.<span>Operate smarter.</span></h1>
+        <p class="lede">Your Operations Redefined. Track every vehicle, driver, asset and litre of fuel on one live screen &mdash; built for Philippine fleets since 2012.</p>
+        <div class="cta-row">
+          <a class="btn btn-gold" href="#demo" data-page="demo" id="hero-cta">Book a Demo <svg><use href="#i-arrow"/></svg></a>
+          <a class="btn btn-ghost" href="#solutions" data-page="solutions">Explore solutions</a>
+        </div>
+        <div class="trust">
+          <span><svg><use href="#i-shield"/></svg>LTFRB accredited</span>
+          <span><svg><use href="#i-check"/></svg>Free installation anywhere in PH</span>
+        </div>
+      </div>
+
+      <div class="live" aria-label="Live tracking panel, sample data, demo only">
+        <div class="live-head">
+          <span><span class="dot" aria-hidden="true"></span>Live &middot; Metro Manila</span>
+          <span class="badge">Sample data - demo only</span>
+        </div>
+        <div class="live-body">
+          <div class="map-box">
+            <svg id="map" viewBox="0 0 560 400" role="img" aria-label="Stylised map of Metro Manila roads with moving sample vehicles">
+              <defs><pattern id="grid" width="28" height="28" patternUnits="userSpaceOnUse"><path d="M28 0H0V28" fill="none" stroke="rgba(255,255,255,.035)"/></pattern></defs>
+              <rect width="560" height="400" fill="url(#grid)"/>
+              <path d="M0 120 C30 160 40 220 20 280 C10 330 30 370 0 400 Z" fill="#0A1060"/>
+              <text x="14" y="210" class="district" style="font-size:10px;opacity:.8" transform="rotate(-80 14 210)">Manila Bay</text>
+              <path d="M40 236 C120 222 170 252 230 240 S330 202 380 230 S470 282 560 262" fill="none" stroke="#1E2F86" stroke-width="7" stroke-linecap="round"/>
+              <path class="road" d="M100 118 L300 150"/>
+              <path class="road" d="M240 18 L252 200"/>
+              <path class="road" d="M90 360 L300 344 L540 332"/>
+              <path class="road" d="M60 60 C120 90 140 150 120 210"/>
+              <path class="road" d="M330 300 L360 392"/>
+              <path class="road" d="M480 40 C470 110 500 150 540 170"/>
+              <path class="road major" id="r-edsa" d="M150 26 C200 90 250 120 300 150 S362 230 330 300 S262 368 206 392"/>
+              <path class="road major" id="r-c5" d="M386 18 C392 100 420 150 430 210 S440 320 472 392"/>
+              <path class="road major" id="r-bue" d="M56 302 C140 300 200 312 300 300 S400 288 448 302"/>
+              <path class="road major" id="r-ort" d="M282 166 C340 170 400 178 548 160"/>
+              <circle cx="402" cy="350" r="34" fill="rgba(250,221,167,.04)" stroke="rgba(250,221,167,.5)" stroke-width="1.2" stroke-dasharray="4 4"/>
+              <text x="402" y="398" text-anchor="middle" class="district" style="font-size:10px">Geofence: sample yard</text>
+              <text x="186" y="66" class="district">QUEZON CITY</text>
+              <text x="62" y="176" class="district">MANILA</text>
+              <text x="296" y="218" class="district">MANDALUYONG</text>
+              <text x="470" y="214" class="district">PASIG</text>
+              <text x="150" y="282" class="district">MAKATI</text>
+              <text x="440" y="300" class="district" dx="-12" dy="-6">TAGUIG</text>
+              <g id="markers"></g>
+            </svg>
+            <div class="toast off" id="toast" role="status" aria-live="polite">
+              <svg><use href="#i-alert"/></svg>
+              <div><span id="toast-msg">Geofence exit</span><small>Sample data</small></div>
+            </div>
+          </div>
+          <div class="vlist" id="vlist" aria-label="Sample vehicles"></div>
+        </div>
+        <div class="live-foot"><span>Plates, drivers and positions are sample data</span><span class="num" id="clock"></span></div>
+      </div>
+    </div>
+  </div>
+
+  <section class="band" style="padding-top:32px" aria-labelledby="stats-h">
+    <div class="wrap">
+      <h2 class="h-sec" id="stats-h">Trusted across the Philippines</h2>
+      <p class="sub">From single delivery vans to nationwide trucking operations.</p>
+      <div class="stats" style="margin-top:28px">
+        <div class="stat"><b>20k+</b><span>Fleets managed</span></div>
+        <div class="stat"><b>1k+</b><span>Companies</span></div>
+        <div class="stat"><b>&#8369;10B+</b><span>Pesos saved</span></div>
+        <div class="stat"><b>101+</b><span>Industries</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" style="padding-top:0" aria-labelledby="sol-h">
+    <div class="wrap">
+      <h2 class="h-sec" id="sol-h">One platform, four ways to see your operation</h2>
+      <div class="tabs" role="tablist" aria-label="Solutions">
+        <button class="tab" role="tab" id="t-veh" aria-controls="p-veh" aria-selected="true">Vehicle Tracking</button>
+        <button class="tab" role="tab" id="t-drv" aria-controls="p-drv" aria-selected="false" tabindex="-1">Real-time Driver Tracking</button>
+        <button class="tab" role="tab" id="t-ast" aria-controls="p-ast" aria-selected="false" tabindex="-1">Asset Tracking</button>
+        <button class="tab" role="tab" id="t-fuel" aria-controls="p-fuel" aria-selected="false" tabindex="-1">Fuel Management</button>
+      </div>
+
+      <div class="tabpanel" role="tabpanel" id="p-veh" aria-labelledby="t-veh">
+        <div>
+          <h3>Vehicle Tracking</h3>
+          <p>GPS tracking with smart geofencing. Know where every unit is, where it has been, and the moment it leaves the area it should stay in.</p>
+          <ul class="ticks"><li><svg><use href="#i-check"/></svg>Live GPS position for every vehicle</li><li><svg><use href="#i-check"/></svg>Smart geofencing with alerts</li></ul>
+          <a class="link-more" href="#solutions" data-page="solutions">More on Vehicle Tracking <svg width="16" height="16"><use href="#i-arrow"/></svg></a>
+        </div>
+        <div class="media"><img src="images/fleet-truck.webp" alt="Row of navy blue Fuso dump trucks parked under a shed" width="800" height="600" data-zoom></div>
+      </div>
+
+      <div class="tabpanel" role="tabpanel" id="p-drv" aria-labelledby="t-drv" hidden>
+        <div>
+          <h3>Real-time Driver Tracking</h3>
+          <p>Cabin-facing monitoring that watches driver behaviour on the road, so risky moments are flagged while there is still time to act.</p>
+          <ul class="ticks"><li><svg><use href="#i-check"/></svg>Cabin-facing camera monitoring</li><li><svg><use href="#i-check"/></svg>Driver behaviour alerts</li></ul>
+          <a class="link-more" href="#solutions" data-page="solutions">More on Driver Tracking <svg width="16" height="16"><use href="#i-arrow"/></svg></a>
+        </div>
+        <div class="media">
+          <svg class="mock" viewBox="0 0 400 300" role="img" aria-label="Mock cabin camera alert card, sample data">
+            <rect width="400" height="300" fill="#0A0D44"/>
+            <path d="M0 70 L120 40 L280 40 L400 70 L400 0 L0 0Z" fill="#141860"/>
+            <path d="M60 300 C70 230 120 205 200 205 C280 205 330 230 340 300Z" fill="#1E2266"/>
+            <circle cx="200" cy="140" r="44" fill="#262B72"/>
+            <path d="M150 300 L172 212 M250 300 L228 212" stroke="#141860" stroke-width="6"/>
+            <rect x="140" y="82" width="120" height="122" rx="6" fill="none" stroke="#FF6B6B" stroke-width="2" stroke-dasharray="7 5"/>
+            <circle cx="186" cy="134" r="4" fill="#A3A8CC"/><circle cx="214" cy="134" r="4" fill="#A3A8CC"/>
+            <path d="M180 134h12M208 134h12" stroke="#A3A8CC" stroke-width="2"/>
+            <circle cx="22" cy="24" r="5" fill="#FF6B6B"/>
+            <text x="34" y="29" fill="#F7F8F8" font-family="system-ui,sans-serif" font-size="13" font-weight="600">CAM 2 &middot; Cabin</text>
+            <text x="380" y="29" text-anchor="end" fill="#A3A8CC" font-family="ui-monospace,monospace" font-size="12">NBC 1234</text>
+            <rect x="16" y="230" width="368" height="56" rx="8" fill="#080B48" stroke="rgba(255,107,107,.55)"/>
+            <path d="M40 246 l10 18 h-20z" fill="none" stroke="#FF6B6B" stroke-width="2" stroke-linejoin="round"/>
+            <text x="62" y="254" fill="#F7F8F8" font-family="system-ui,sans-serif" font-size="14" font-weight="600">Drowsiness detected &middot; Ramon</text>
+            <text x="62" y="273" fill="#A3A8CC" font-family="system-ui,sans-serif" font-size="12">EDSA northbound &middot; 54 km/h &middot; Sample data</text>
+          </svg>
+        </div>
+      </div>
+
+      <div class="tabpanel" role="tabpanel" id="p-ast" aria-labelledby="t-ast" hidden>
+        <div>
+          <h3>Asset Tracking</h3>
+          <p>Track unpowered assets too &mdash; trailers, containers and equipment &mdash; with scheduled location check-ins and geofence alerts when something moves that shouldn't.</p>
+          <ul class="ticks"><li><svg><use href="#i-check"/></svg>Works on unpowered assets</li><li><svg><use href="#i-check"/></svg>Scheduled tracking</li><li><svg><use href="#i-check"/></svg>Geofence alerts</li></ul>
+          <a class="link-more" href="#solutions" data-page="solutions">More on Asset Tracking <svg width="16" height="16"><use href="#i-arrow"/></svg></a>
+        </div>
+        <div class="media"><img src="images/construction.webp" alt="Two orange excavators working on a construction site" width="800" height="600" data-zoom></div>
+      </div>
+
+      <div class="tabpanel" role="tabpanel" id="p-fuel" aria-labelledby="t-fuel" hidden>
+        <div>
+          <h3>Fuel Management</h3>
+          <p>See fuel levels across the fleet and spot the drops that don't match the kilometres driven.</p>
+          <ul class="ticks"><li><svg><use href="#i-check"/></svg>Fuel level history per vehicle</li><li><svg><use href="#i-check"/></svg>Unusual drops flagged on the timeline</li></ul>
+          <a class="link-more" href="#solutions" data-page="solutions">More on Fuel Management <svg width="16" height="16"><use href="#i-arrow"/></svg></a>
+        </div>
+        <div class="media">
+          <img src="images/fuel-tanker.webp" alt="White Isuzu fuel tanker truck parked at a depot" width="800" height="600" data-zoom>
+          <div class="chart">
+            <svg viewBox="0 0 240 104" role="img" aria-label="Sample fuel level chart over 24 hours with one sudden drop">
+              <text x="0" y="11" fill="#F7F8F8" font-family="system-ui,sans-serif" font-size="11" font-weight="600">Fuel level &middot; 24 h</text>
+              <text x="240" y="11" text-anchor="end" fill="#FADDA7" font-family="system-ui,sans-serif" font-size="10">Sample data</text>
+              <path d="M24 26H240M24 54H240M24 82H240" stroke="rgba(255,255,255,.08)"/>
+              <text x="0" y="29" fill="#A3A8CC" font-size="9" font-family="system-ui,sans-serif">100</text>
+              <text x="6" y="85" fill="#A3A8CC" font-size="9" font-family="system-ui,sans-serif">0</text>
+              <polyline points="24,30 50,38 76,46 96,52 100,30 126,38 150,46 156,72 180,76 206,82 232,88" fill="none" stroke="#C9A227" stroke-width="2" stroke-linejoin="round"/>
+              <circle cx="156" cy="72" r="4" fill="#FF6B6B"/>
+              <text x="162" y="66" fill="#FF8A8A" font-size="9" font-family="system-ui,sans-serif">Sudden drop</text>
+              <text x="96" y="100" fill="#A3A8CC" font-size="9" font-family="system-ui,sans-serif" text-anchor="middle">Refuel</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="photo" aria-labelledby="band-h">
+    <img src="images/expressway.webp" alt="Fuel tanker truck and vans queuing at a Philippine expressway toll plaza" width="1280" height="960">
+    <div class="wrap">
+      <h2 id="band-h">Your GPS Partner &mdash; from the toll plaza to the last drop-off.</h2>
+      <div class="cta-row"><a class="btn btn-gold" href="#demo" data-page="demo">Book a Demo <svg><use href="#i-arrow"/></svg></a></div>
+    </div>
+  </section>
+
+  <section class="band" aria-labelledby="perks-h">
+    <div class="wrap">
+      <div class="perks-wrap">
+        <div>
+          <h2 class="h-sec" id="perks-h">What comes free with SSD GPS</h2>
+          <p class="sub">No extra line items for the things that keep your devices working.</p>
+        </div>
+        <ul class="perks">
+          <li><svg><use href="#i-pin"/></svg><b>Free installation</b><span>Anywhere in the Philippines.</span></li>
+          <li><svg><use href="#i-infinity"/></svg><b>Lifetime warranty</b><span>On your tracking devices.</span></li>
+          <li><svg><use href="#i-swap"/></svg><b>Free device transfer*</b><span>Moving a unit to another vehicle. *T&amp;C apply.</span></li>
+          <li><svg><use href="#i-steth"/></svg><b>Free check-up</b><span>Service visits to keep units healthy.</span></li>
+          <li><svg><use href="#i-cap"/></svg><b>Free platform training</b><span>So your team uses every feature.</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" style="padding-top:0" aria-labelledby="ind-h">
+    <div class="wrap">
+      <div class="cred">
+        <div class="seal">
+          <svg><use href="#i-shield"/></svg>
+          <div><b>LTFRB accredited &middot; Since 2012</b><span>Over a decade of GPS tracking for Philippine fleets.</span></div>
+        </div>
+        <a class="btn btn-ghost" href="#demo" data-page="demo">Talk to our team</a>
+      </div>
+      <h2 class="h-sec" id="ind-h" style="margin-top:64px">Built for the industries that keep the country moving</h2>
+      <div class="chips">
+        <span class="chip">Supermarket</span><span class="chip">Transportation</span><span class="chip">Food &amp; Beverage</span><span class="chip">Hardware</span><span class="chip">Logistics</span><span class="chip">Trucking</span><span class="chip">Automotive</span><span class="chip">Construction</span><span class="chip">Cargo &amp; Shipping</span>
+      </div>
+    </div>
+  </section>
+</section>
+
+<!-- ============ SOLUTIONS ============ -->
+<section id="solutions" class="page" hidden>
+  <div class="page-head">
+    <img src="images/hero-trucks.webp" alt="Yellow cement mixer truck pouring concrete beside a Metro Manila flyover" width="1280" height="960">
+    <div class="wrap">
+      <h1>Solutions for every part of your operation</h1>
+      <p class="sub" style="color:var(--t2)">Vehicles, drivers, assets and fuel &mdash; plus AI safety and reporting that turns tracking data into decisions.</p>
+    </div>
+  </div>
+  <div class="wrap">
+    <article class="sol">
+      <div>
+        <h2>Vehicle Tracking</h2>
+        <p>GPS tracking with smart geofencing for every unit in your fleet. Draw the areas that matter &mdash; depots, client sites, routes &mdash; and get alerted on entry and exit.</p>
+        <ul class="ticks"><li><svg><use href="#i-check"/></svg>Live GPS map of the whole fleet</li><li><svg><use href="#i-check"/></svg>Smart geofencing</li><li><svg><use href="#i-check"/></svg>Trip history per vehicle</li></ul>
+        <a class="link-more" href="#demo" data-page="demo" data-interest="Vehicle Tracking">Book a demo of this <svg width="16" height="16"><use href="#i-arrow"/></svg></a>
+      </div>
+      <div class="sol-media media"><img src="images/fleet-truck.webp" alt="Row of navy blue Fuso dump trucks parked under a shed" width="800" height="600" data-zoom></div>
+    </article>
+    <article class="sol">
+      <div>
+        <h2>Real-time Driver Tracking</h2>
+        <p>Cabin-facing monitoring and driver behaviour tracking. See how each driver handles the road, and coach with facts instead of guesses.</p>
+        <ul class="ticks"><li><svg><use href="#i-check"/></svg>Cabin-facing camera monitoring</li><li><svg><use href="#i-check"/></svg>Driver behaviour events</li></ul>
+        <a class="link-more" href="#demo" data-page="demo" data-interest="Real-time Driver Tracking">Book a demo of this <svg width="16" height="16"><use href="#i-arrow"/></svg></a>
+      </div>
+      <div class="sol-media icon-tile"><svg><use href="#i-ai"/></svg></div>
+    </article>
+    <article class="sol">
+      <div>
+        <h2>Asset Tracking</h2>
+        <p>Keep tabs on unpowered assets such as trailers, containers and heavy equipment, with scheduled tracking and geofence alerts.</p>
+        <ul class="ticks"><li><svg><use href="#i-check"/></svg>Unpowered asset support</li><li><svg><use href="#i-check"/></svg>Scheduled tracking</li><li><svg><use href="#i-check"/></svg>Geofence alerts</li></ul>
+        <a class="link-more" href="#demo" data-page="demo" data-interest="Asset Tracking">Book a demo of this <svg width="16" height="16"><use href="#i-arrow"/></svg></a>
+      </div>
+      <div class="sol-media media"><img src="images/construction.webp" alt="Two orange excavators working on a construction site" width="800" height="600" data-zoom></div>
+    </article>
+    <article class="sol">
+      <div>
+        <h2>Fuel Management</h2>
+        <p>Monitor fuel across the fleet and catch consumption that doesn't add up.</p>
+        <ul class="ticks"><li><svg><use href="#i-check"/></svg>Fuel level monitoring</li><li><svg><use href="#i-check"/></svg>Unusual drops highlighted</li></ul>
+        <a class="link-more" href="#demo" data-page="demo" data-interest="Fuel Management">Book a demo of this <svg width="16" height="16"><use href="#i-arrow"/></svg></a>
+      </div>
+      <div class="sol-media media"><img src="images/fuel-tanker.webp" alt="White Isuzu fuel tanker truck parked at a depot" width="800" height="600" data-zoom></div>
+    </article>
+    <article class="sol">
+      <div>
+        <h2>AI Safety Programs</h2>
+        <p>AI video that watches the road and the cabin, flagging risky moments so your safety programme runs on evidence.</p>
+        <ul class="ticks"><li><svg><use href="#i-check"/></svg>AI video monitoring</li><li><svg><use href="#i-check"/></svg>Safety events for driver coaching</li></ul>
+        <a class="link-more" href="#demo" data-page="demo" data-interest="AI Safety Programs">Book a demo of this <svg width="16" height="16"><use href="#i-arrow"/></svg></a>
+      </div>
+      <div class="sol-media icon-tile"><svg><use href="#i-shield"/></svg></div>
+    </article>
+    <article class="sol">
+      <div>
+        <h2>Workflows &amp; Reporting</h2>
+        <p>Turn tracking data into the reports and routines your managers already work with.</p>
+        <ul class="ticks"><li><svg><use href="#i-check"/></svg>Operational workflows</li><li><svg><use href="#i-check"/></svg>Fleet reports</li></ul>
+        <a class="link-more" href="#demo" data-page="demo" data-interest="Workflows &amp; Reporting">Book a demo of this <svg width="16" height="16"><use href="#i-arrow"/></svg></a>
+      </div>
+      <div class="sol-media icon-tile"><svg><use href="#i-flow"/></svg></div>
+    </article>
+  </div>
+</section>
+
+<!-- ============ BOOK A DEMO ============ -->
+<section id="demo" class="page" hidden>
+  <div class="wrap demo">
+    <div>
+      <h1 class="h-sec">Book a Demo</h1>
+      <p class="sub">See the platform on your own fleet's use case. We'll reach out to schedule.</p>
+      <form id="demo-form" novalidate style="margin-top:24px">
+        <div class="row2">
+          <div class="field"><label for="f-name">Full name</label><input id="f-name" name="name" autocomplete="name" aria-describedby="e-name"><p class="err" id="e-name" hidden></p></div>
+          <div class="field"><label for="f-company">Company</label><input id="f-company" name="company" autocomplete="organization" aria-describedby="e-company"><p class="err" id="e-company" hidden></p></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label for="f-mobile">Mobile number</label><input id="f-mobile" name="mobile" type="tel" inputmode="numeric" autocomplete="tel" placeholder="09XX XXX XXXX" aria-describedby="e-mobile"><p class="err" id="e-mobile" hidden></p></div>
+          <div class="field"><label for="f-email">Work email</label><input id="f-email" name="email" type="email" autocomplete="email" placeholder="you@company.ph" aria-describedby="e-email"><p class="err" id="e-email" hidden></p></div>
+        </div>
+        <div class="field">
+          <label for="f-fleet">Fleet size</label>
+          <select id="f-fleet" name="fleet" aria-describedby="e-fleet">
+            <option value="">Select number of vehicles</option>
+            <option>1 - 10 vehicles</option><option>11 - 50 vehicles</option><option>51 - 200 vehicles</option><option>201+ vehicles</option>
+          </select>
+          <p class="err" id="e-fleet" hidden></p>
+        </div>
+        <fieldset>
+          <legend class="legend">Solutions of interest <span class="opt">(optional)</span></legend>
+          <div class="checks">
+            <label class="chk"><input type="checkbox" name="interest" value="Vehicle Tracking"><span class="box"><svg><use href="#i-check"/></svg></span>Vehicle Tracking</label>
+            <label class="chk"><input type="checkbox" name="interest" value="Real-time Driver Tracking"><span class="box"><svg><use href="#i-check"/></svg></span>Real-time Driver Tracking</label>
+            <label class="chk"><input type="checkbox" name="interest" value="Asset Tracking"><span class="box"><svg><use href="#i-check"/></svg></span>Asset Tracking</label>
+            <label class="chk"><input type="checkbox" name="interest" value="Fuel Management"><span class="box"><svg><use href="#i-check"/></svg></span>Fuel Management</label>
+            <label class="chk"><input type="checkbox" name="interest" value="AI Safety Programs"><span class="box"><svg><use href="#i-check"/></svg></span>AI Safety Programs</label>
+            <label class="chk"><input type="checkbox" name="interest" value="Workflows &amp; Reporting"><span class="box"><svg><use href="#i-check"/></svg></span>Workflows &amp; Reporting</label>
+          </div>
+        </fieldset>
+        <div class="field"><label for="f-msg">What's your #1 fleet concern? <span class="opt">(optional)</span></label><textarea id="f-msg" name="message" placeholder="e.g. fuel costs, driver safety, late deliveries"></textarea></div>
+        <div><button class="btn btn-gold" type="submit">Request my demo <svg><use href="#i-arrow"/></svg></button></div>
+        <p class="note">Prototype: this form validates but sends nothing.</p>
+      </form>
+      <div class="success" id="success" role="status" tabindex="-1" hidden>
+        <svg><use href="#i-check"/></svg>
+        <h2>Thanks, <span id="s-name"></span> &mdash; request received.</h2>
+        <p>In the live site our team would now contact you to schedule your demo. In this prototype nothing was sent.</p>
+        <div class="ref">Ref <span id="s-ref" class="num"></span> <span class="badge">Sample reference</span></div>
+        <div><button class="btn btn-ghost" type="button" id="again" style="margin-top:18px">Book another demo</button></div>
+      </div>
+    </div>
+    <aside class="aside" aria-label="Contact details">
+      <h2 style="font-size:20px;font-weight:590">Prefer to talk now?</h2>
+      <ul class="contact-list">
+        <li><a href="tel:+639190665187"><svg><use href="#i-phone"/></svg>+63 919 066 5187</a></li>
+        <li><a href="mailto:info@ssdgps.com"><svg><use href="#i-mail"/></svg>info@ssdgps.com</a></li>
+        <li><span class="addr"><svg><use href="#i-pin"/></svg>2904A West Tektite Towers, Exchange Road, Ortigas Center, Pasig City</span></li>
+      </ul>
+      <ul class="perks" style="margin-top:8px">
+        <li><svg><use href="#i-pin"/></svg><b>Free installation</b><span>Anywhere in the Philippines.</span></li>
+        <li><svg><use href="#i-cap"/></svg><b>Free platform training</b><span>Included for your team.</span></li>
+      </ul>
+    </aside>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot">
+      <div>
+        <img src="images/logo.webp" alt="SSD GPS Philippines logo" width="127" height="36" style="height:36px;width:auto">
+        <p style="margin-top:14px;color:var(--t3);max-width:30em">Your GPS Partner. LTFRB accredited, since 2012.</p>
+      </div>
+      <div><h3>Pages</h3><nav aria-label="Footer"><a href="#home" data-page="home">Home</a><a href="#solutions" data-page="solutions">Solutions</a><a href="#demo" data-page="demo">Book a Demo</a></nav></div>
+      <div><h3>Contact</h3>
+        <ul class="contact-list">
+          <li><a href="tel:+639190665187"><svg><use href="#i-phone"/></svg>+63 919 066 5187</a></li>
+          <li><a href="mailto:info@ssdgps.com"><svg><use href="#i-mail"/></svg>info@ssdgps.com</a></li>
+          <li><span class="addr"><svg><use href="#i-pin"/></svg>2904A West Tektite Towers, Exchange Road, Ortigas Center, Pasig City</span></li>
+        </ul>
+      </div>
+    </div>
+    <p class="fine">Design prototype for review &mdash; not the live website. Map, vehicles, plates, drivers and alerts are sample data. Photos: Wikimedia Commons (CC), placeholders for SSD's own photography.</p>
+  </div>
+</footer>
+
+<div id="lightbox" role="dialog" aria-modal="true" aria-label="Photo preview" hidden><img alt="Enlarged photo preview"><button type="button" aria-label="Close preview">&times;</button></div>
+
+<script>
+// ---- page switching ----
+function show(page){
+  if(!document.getElementById(page)) page='home';
+  document.querySelectorAll('.page').forEach(s=>s.hidden=s.id!==page);
+  document.querySelectorAll('[data-page]').forEach(a=>a.classList.toggle('active',a.dataset.page===page));
+  history.replaceState(null,'','#'+page);
+  window.scrollTo(0,0);
+}
+document.querySelectorAll('[data-page]').forEach(a=>a.addEventListener('click',e=>{
+  e.preventDefault();
+  if(a.dataset.interest) document.querySelectorAll('input[name=interest]').forEach(c=>{if(c.value===a.dataset.interest)c.checked=true});
+  document.body.classList.remove('nav-open');burger.setAttribute('aria-expanded',false);
+  show(a.dataset.page);
+}));
+const burger=document.getElementById('burger');
+burger.addEventListener('click',()=>burger.setAttribute('aria-expanded',document.body.classList.toggle('nav-open')));
+
+// ---- tabs ----
+const tabs=[...document.querySelectorAll('[role=tab]')];
+function selectTab(t){
+  tabs.forEach(x=>{const on=x===t;x.setAttribute('aria-selected',on);x.tabIndex=on?0:-1;document.getElementById(x.getAttribute('aria-controls')).hidden=!on});
+}
+tabs.forEach((t,i)=>{
+  t.addEventListener('click',()=>selectTab(t));
+  t.addEventListener('keydown',e=>{const d=e.key==='ArrowRight'?1:e.key==='ArrowLeft'?-1:0;if(d){const n=tabs[(i+d+tabs.length)%tabs.length];selectTab(n);n.focus()}});
+});
+
+// ---- live tracking panel (all sample data) ----
+const V=[
+  {plate:'NBC 1234',driver:'Ramon',status:'Moving',route:'r-edsa',t:.15,v:.035,fuel:72},
+  {plate:'NDA 5821',driver:'Liza',status:'Moving',route:'r-c5',t:.55,v:.03,fuel:58},
+  {plate:'NFX 9142',driver:'Carlo',status:'Moving',route:'r-bue',t:.3,v:.045,fuel:41},
+  {plate:'NCR 7716',driver:'Bea',status:'Moving',route:'r-ort',t:1.3,v:.04,fuel:65},
+  {plate:'NAQ 3307',driver:'Jun',status:'Idle',at:[452,186],fuel:86},
+  {plate:'NGT 4410',driver:'Mae',status:'Stopped',at:[176,338],fuel:23}
+];
+const COL={Moving:'#3CCF63',Idle:'#A3A8CC',Stopped:'#FF6B6B'};
+const markers=document.getElementById('markers'), vlist=document.getElementById('vlist');
+markers.innerHTML=V.map((o,i)=>`<g class="veh" data-i="${i}">
+  <circle class="halo" r="15"/>${o.status==='Moving'?`<circle class="pulse" r="6" fill="${COL[o.status]}"/>`:''}
+  <circle r="6.5" fill="${COL[o.status]}" stroke="#05072F" stroke-width="2.5"/>
+  <g class="tag"><rect x="12" y="-24" width="70" height="20" rx="4" fill="#161A5C" stroke="rgba(250,221,167,.6)"/><text x="47" y="-10" text-anchor="middle" fill="#F7F8F8" font-size="11" font-family="ui-monospace,Consolas,monospace">${o.plate}</text></g></g>`).join('');
+vlist.innerHTML=V.map((o,i)=>`<button type="button" class="vcard" data-i="${i}" aria-pressed="false">
+  <span class="plate">${o.plate}</span><span class="st st-${o.status}">${o.status}</span>
+  <span>${o.driver}</span><span></span><span class="meta"><span data-speed></span> &middot; Fuel <span data-fuel></span>%</span></button>`).join('');
+V.forEach((o,i)=>{
+  o.g=markers.children[i]; o.card=vlist.children[i];
+  o.speed=o.status==='Moving'?35+Math.round(Math.random()*25):0;
+  if(o.route){o.path=document.getElementById(o.route);o.len=o.path.getTotalLength()}
+  else o.g.setAttribute('transform',`translate(${o.at[0]} ${o.at[1]})`);
+});
+function place(o){const p=o.path.getPointAtLength((o.t<1?o.t:2-o.t)*o.len);o.g.setAttribute('transform',`translate(${p.x.toFixed(1)} ${p.y.toFixed(1)})`)}
+function renderStats(){V.forEach(o=>{o.card.querySelector('[data-speed]').textContent=o.speed+' km/h';o.card.querySelector('[data-fuel]').textContent=Math.round(o.fuel)})}
+function select(i){V.forEach((o,j)=>{o.g.classList.toggle('sel',i===j);o.card.setAttribute('aria-pressed',i===j)});markers.appendChild(V[i].g)}
+vlist.addEventListener('click',e=>{const b=e.target.closest('.vcard');if(b)select(+b.dataset.i)});
+markers.addEventListener('click',e=>{const g=e.target.closest('.veh');if(g)select(+g.dataset.i)});
+V.filter(o=>o.len).forEach(place);renderStats();select(0);
+
+const still=matchMedia('(prefers-reduced-motion: reduce)').matches;
+let last=performance.now();
+function frame(ts){
+  const dt=Math.min(.05,(ts-last)/1000);last=ts;
+  if(!document.getElementById('home').hidden) V.forEach(o=>{if(o.len){o.t=(o.t+o.v*dt)%2;place(o)}}); // t in [0,2): ping-pong along the road
+  requestAnimationFrame(frame);
+}
+if(!still) requestAnimationFrame(frame);
+setInterval(()=>{V.forEach(o=>{if(o.status==='Moving'){o.speed=Math.max(18,Math.min(68,o.speed+Math.round(Math.random()*12-6)));o.fuel=Math.max(5,o.fuel-.05)}});renderStats()},2000);
+
+const toast=document.getElementById('toast'),toastMsg=document.getElementById('toast-msg');
+const ALERTS=['Geofence exit &mdash; NDA 5821 left sample yard','Harsh braking detected &mdash; NFX 9142','Overspeeding &mdash; NCR 7716 on Ortigas Ave'];
+let ai=0;
+function alertCycle(){toastMsg.innerHTML=ALERTS[ai++%ALERTS.length];toast.classList.remove('off');setTimeout(()=>toast.classList.add('off'),4500)}
+setTimeout(alertCycle,2500);setInterval(alertCycle,9000);
+const clock=document.getElementById('clock');
+const tick=()=>clock.textContent='Updated '+new Date().toLocaleTimeString('en-PH',{hour12:false});
+tick();setInterval(tick,1000);
+
+// ---- demo form (validates, sends nothing) ----
+const form=document.getElementById('demo-form'),okBox=document.getElementById('success');
+const MOBILE=/^09\d{2} ?\d{3} ?\d{4}$/, EMAIL=/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+console.assert(MOBILE.test('0917 123 4567')&&MOBILE.test('09171234567')&&!MOBILE.test('0817 123 4567')&&!MOBILE.test('0917 123 456'),'mobile pattern');
+const rules={
+  name:v=>v.length<2?'Enter your full name.':'',
+  company:v=>!v?'Enter your company name.':'',
+  mobile:v=>!v?'Enter your mobile number.':!MOBILE.test(v)?'Use the PH mobile format 09XX XXX XXXX.':'',
+  email:v=>!v?'Enter your work email.':!EMAIL.test(v)?'Check the email address, e.g. you@company.ph.':'',
+  fleet:v=>!v?'Choose your fleet size.':''
+};
+const errIcon='<svg aria-hidden="true"><use href="#i-alert"/></svg>';
+function check(name){
+  const el=form.elements[name],msg=rules[name](el.value.trim()),err=document.getElementById('e-'+name);
+  el.setAttribute('aria-invalid',!!msg);err.hidden=!msg;err.innerHTML=msg?errIcon+msg:'';
+  return !msg;
+}
+Object.keys(rules).forEach(n=>form.elements[n].addEventListener(n==='fleet'?'change':'input',()=>{if(form.elements[n].getAttribute('aria-invalid')==='true')check(n)}));
+form.addEventListener('submit',e=>{
+  e.preventDefault();
+  const bad=Object.keys(rules).filter(n=>!check(n));
+  if(bad.length){form.elements[bad[0]].focus();return}
+  document.getElementById('s-name').textContent=form.elements.name.value.trim().split(' ')[0];
+  document.getElementById('s-ref').textContent='SSD-'+String(Math.floor(100000+Math.random()*900000));
+  form.hidden=true;okBox.hidden=false;okBox.focus();
+});
+document.getElementById('again').addEventListener('click',()=>{form.reset();okBox.hidden=true;form.hidden=false;form.elements.name.focus()});
+
+// ---- lightbox ----
+const box=document.getElementById('lightbox'),boxImg=box.querySelector('img');let opener;
+document.querySelectorAll('[data-zoom]').forEach(img=>{
+  const open=()=>{opener=img;boxImg.src=img.src;boxImg.alt=img.alt;box.hidden=false;box.querySelector('button').focus()};
+  img.tabIndex=0;img.setAttribute('role','button');img.setAttribute('aria-label','Enlarge photo: '+img.alt);
+  img.addEventListener('click',open);
+  img.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open()}});
+});
+const closeBox=()=>{if(box.hidden)return;box.hidden=true;opener&&opener.focus()};
+box.addEventListener('click',closeBox);
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeBox()});
+
+show(location.hash.slice(1)||'home');
+</script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+SSD GPS Philippines - website prototype brief
+(Internal demo: redesign of www.ssdgps.com. Facts below are from ssdgps.com and the FB page, read 2026-11-02.)
+
+1. Reference site: current www.ssdgps.com (Wix). Demo = "the improved version". [our call]
+2. Pages (3): Home, Solutions, Book a Demo. [our call]
+3. Brand: navy #080B48, slate #3C3F6D, cream #FADDA7 / #FCE9C5, metallic-gold logo (images/logo.webp, from their site).
+   Fonts on live site: Raleway / Open Sans -> system font stack in demo (offline rule).
+4. Demo must prove: Book-a-Demo form + a convincing "live tracking" visual. [our call]
+5. Business facts (REAL, from their site - do not invent others):
+   - Tagline: "Your GPS Partner" / "Your Operations Redefined" / "See better. Operate smarter."
+   - Founded 2012, LTFRB accredited. Stats: 20k+ fleets managed, 1k+ companies, 10B+ pesos saved, 101+ industries.
+   - Solutions: Vehicle Tracking (GPS + smart geofencing), Real-time Driver Tracking (cabin-facing monitoring,
+     driver behavior), Asset Tracking (unpowered assets, scheduled tracking, geofence alerts), Fuel Management;
+     also AI Safety Programs (AI video), Workflows & Reporting.
+   - Perks: FREE installation anywhere in PH, Lifetime warranty, FREE device transfer (T&C apply),
+     FREE check-up/service, FREE platform training.
+   - Industries: Supermarket, Transportation, Food & Beverage, Hardware, Logistics, Trucking, Automotive,
+     Construction, Cargo & Shipping.
+   - Phone +63 919 066 5187 | info@ssdgps.com
+   - 2904A West Tektite Towers, Exchange Road, Ortigas Center, Pasig City
+   - FB post: "What's your #1 fleet concern?"
+   Anything else (plate numbers, vehicle names, map data, prices) = visibly labelled SAMPLE data.
+6. Deadline: none given. [our call: same day]
+
+Photos: Wikimedia Commons (CC licensed), PH-verified, no third-party company branding except a small
+Phoenix mark on fuel-tanker.webp. Live site needs SSD's own photos.
